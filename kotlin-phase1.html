@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Phase 1 — Kotlin Deep Dive | IBM Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#070b14;--sf:#0f1622;--sf2:#162030;--sf3:#1c2a40;
+  --br:#1e2d45;--br2:#243450;
+  --ac:#38bdf8;--ac2:#818cf8;--ac3:#34d399;
+  --warn:#fbbf24;--red:#f87171;
+  --tx:#e2e8f0;--tx2:#94a3b8;--mu:#4a5568;
+  --code:#060a11;
+}
+body{background:var(--bg);font-family:"Sora",sans-serif;color:var(--tx);display:flex;min-height:100vh}
+#sb{position:fixed;top:0;left:0;width:268px;height:100vh;background:var(--sf);border-right:1px solid var(--br);display:flex;flex-direction:column;z-index:100;overflow:hidden}
+.sbh{padding:18px 16px 12px;border-bottom:1px solid var(--br)}
+.sbb{font-size:11px;font-weight:800;color:var(--ac);letter-spacing:2.5px;text-transform:uppercase}
+.sbs{font-size:11px;color:var(--tx2);margin-top:3px}
+.sbp{height:3px;background:var(--br);border-radius:2px;margin-top:10px}
+.sbpf{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:2px;transition:width .4s}
+.sbc{font-size:10px;color:var(--mu);margin-top:4px}
+.sbn{overflow-y:auto;flex:1;padding:6px 0}
+.sbn::-webkit-scrollbar{width:4px}
+.sbn::-webkit-scrollbar-thumb{background:var(--br2);border-radius:2px}
+.sbg{padding:12px 16px 3px;font-size:9px;font-weight:800;color:var(--mu);letter-spacing:2px;text-transform:uppercase}
+.sbi{display:flex;align-items:center;gap:9px;padding:8px 16px;cursor:pointer;font-size:12.5px;color:var(--tx2);border-left:3px solid transparent;transition:all .15s}
+.sbi:hover{color:var(--tx);background:var(--sf2)}
+.sbi.active{color:var(--ac);background:rgba(56,189,248,.08);border-left-color:var(--ac)}
+.sbn2{margin-left:auto;font-size:10px;font-family:"JetBrains Mono",monospace;color:var(--mu);background:var(--sf2);padding:1px 6px;border-radius:10px}
+.sbi.active .sbn2{background:rgba(56,189,248,.15);color:var(--ac)}
+#main{margin-left:268px;flex:1;overflow-y:auto;min-height:100vh}
+.ct{max-width:880px;margin:0 auto;padding:32px 36px 100px}
+.sec{display:none}.sec.active{display:block}
+.thd{margin-bottom:32px;padding-bottom:18px;border-bottom:1px solid var(--br)}
+.ttag{font-size:11px;font-family:"JetBrains Mono",monospace;color:var(--ac2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.ttl{font-size:30px;font-weight:800;color:var(--tx);line-height:1.2}
+.tdesc{font-size:14px;color:var(--tx2);margin-top:8px;line-height:1.7}
+.con{margin-bottom:32px}
+.cttl{font-size:16px;font-weight:700;color:var(--tx);padding:11px 15px;background:var(--sf);border:1px solid var(--br);border-left:4px solid var(--ac);border-radius:6px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cttl.green{border-left-color:var(--ac3)}
+.cttl.purple{border-left-color:var(--ac2)}
+.cttl.yellow{border-left-color:var(--warn)}
+.cttl.red{border-left-color:var(--red)}
+.bdg{font-size:10px;font-family:"JetBrains Mono",monospace;padding:2px 8px;border-radius:12px;font-weight:600}
+.b1{background:rgba(56,189,248,.12);color:var(--ac)}
+.b2{background:rgba(52,211,153,.12);color:var(--ac3)}
+.b3{background:rgba(129,140,248,.12);color:var(--ac2)}
+.b4{background:rgba(251,191,36,.12);color:var(--warn)}
+.b5{background:rgba(248,113,113,.12);color:var(--red)}
+.def{background:var(--sf);border:1px solid var(--br);border-left:3px solid var(--ac);border-radius:6px;padding:14px 16px;margin-bottom:12px}
+.lbl{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.def .lbl{color:var(--ac)}
+.dt{font-size:13.5px;color:var(--tx);line-height:1.8}
+.dt strong{color:var(--ac)}
+.dt em{color:var(--ac3);font-style:normal;font-weight:600}
+.exp{background:var(--sf2);border:1px solid var(--br);border-left:3px solid var(--ac2);border-radius:6px;padding:14px 16px;margin-bottom:12px}
+.exp .lbl{color:var(--ac2)}
+.et{font-size:13.5px;color:var(--tx);line-height:1.8}
+.et strong{color:var(--ac2)}
+.cw{margin-bottom:12px;border-radius:8px;overflow:hidden;border:1px solid var(--br)}
+.ch{display:flex;align-items:center;justify-content:space-between;background:#0d1522;padding:8px 13px;border-bottom:1px solid var(--br)}
+.cl{font-size:11px;font-family:"JetBrains Mono",monospace;color:var(--ac3);font-weight:600}
+.cc{font-size:11px;color:var(--tx2);cursor:pointer;background:var(--sf3);border:1px solid var(--br);font-family:"Sora",sans-serif;padding:2px 9px;border-radius:4px;transition:all .15s}
+.cc:hover{color:var(--tx)}
+pre{background:var(--code);padding:16px 18px;overflow-x:auto;font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:1.75;color:#c9d1d9}
+.kw{color:#ff7b72}.fn{color:#d2a8ff}.str{color:#a5d6ff}.cm{color:#6a737d;font-style:italic}
+.num{color:#79c0ff}.cls{color:#ffa657}.ann{color:#ffa657}
+.ib{background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.18);border-left:3px solid var(--warn);border-radius:6px;padding:14px 16px;margin-bottom:12px}
+.ib .lbl{color:var(--warn)}
+.qa{margin-bottom:12px}.qa:last-child{margin-bottom:0}
+.q{font-size:13px;color:var(--warn);font-weight:600;margin-bottom:5px}
+.a{font-size:13px;color:var(--tx);line-height:1.8;padding-left:12px;border-left:2px solid var(--br2)}
+.a strong{color:var(--ac)}
+.tip{background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.2);border-radius:6px;padding:11px 14px;margin-bottom:12px;font-size:13px;color:var(--ac3);line-height:1.7}
+.tip strong{color:var(--ac3)}
+.wrn{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.2);border-radius:6px;padding:11px 14px;margin-bottom:12px;font-size:13px;color:var(--red);line-height:1.7}
+table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:13px}
+th{background:var(--sf2);color:var(--ac);font-weight:700;padding:10px 13px;text-align:left;border:1px solid var(--br);font-size:11px;letter-spacing:.5px;text-transform:uppercase}
+td{padding:9px 13px;border:1px solid var(--br);color:var(--tx);vertical-align:top;line-height:1.5}
+tr:nth-child(even) td{background:rgba(255,255,255,.015)}
+.div{border:none;border-top:1px solid var(--br);margin:24px 0}
+.nv{display:flex;gap:10px;margin-top:44px;padding-top:20px;border-top:1px solid var(--br)}
+.nb{padding:11px 20px;font-size:13px;font-family:"Sora",sans-serif;font-weight:600;border-radius:7px;cursor:pointer;transition:all .2s;border:none}
+.np{background:var(--sf);color:var(--tx2);border:1px solid var(--br)}
+.np:hover{color:var(--tx);background:var(--sf2)}
+.nn{background:var(--ac);color:#000;margin-left:auto}
+.nn:hover{background:#7dd3fc}
+.solid-card{border:1px solid var(--br);border-radius:8px;overflow:hidden;margin-bottom:24px}
+.sh{padding:13px 16px;display:flex;align-items:center;gap:13px}
+.sl{width:42px;height:42px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;font-family:"JetBrains Mono",monospace;flex-shrink:0}
+.sn{font-size:15px;font-weight:700}
+.sg{font-size:12px;margin-top:2px;color:var(--tx2)}
+.sb2{padding:0 16px 16px}
+.clbl{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:7px 13px;display:block}
+.bad{color:var(--red);background:rgba(248,113,113,.06);border-bottom:1px solid rgba(248,113,113,.15)}
+.good{color:var(--ac3);background:rgba(52,211,153,.06);border-bottom:1px solid rgba(52,211,153,.15)}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:var(--br2);border-radius:3px}
+</style>
+</head>
+<body>
+<div id="sb">
+  <div class="sbh">
+    <div class="sbb">Phase 1</div>
+    <div class="sbs">Kotlin Deep Dive · IBM Prep</div>
+    <div class="sbp"><div class="sbpf" id="pf" style="width:9%"></div></div>
+    <div class="sbc" id="pc">1 of 11 sections</div>
+  </div>
+  <div class="sbn">
+    <div class="sbg">Kotlin Core</div>
+    <div class="sbi active" onclick="go('vis',this,1)"><span>👁</span><span>Visibility Modifiers</span><span class="sbn2">01</span></div>
+    <div class="sbi" onclick="go('oop',this,2)"><span>🏗</span><span>OOP Fundamentals</span><span class="sbn2">02</span></div>
+    <div class="sbi" onclick="go('ext',this,3)"><span>🔌</span><span>Extension Functions</span><span class="sbn2">03</span></div>
+    <div class="sbi" onclick="go('nul',this,4)"><span>🛡</span><span>Null Safety &amp; Types</span><span class="sbn2">04</span></div>
+    <div class="sbi" onclick="go('lat',this,5)"><span>⏳</span><span>lateinit vs by lazy</span><span class="sbn2">05</span></div>
+    <div class="sbi" onclick="go('scp',this,6)"><span>🔭</span><span>Scope Functions</span><span class="sbn2">06</span></div>
+    <div class="sbi" onclick="go('hof',this,7)"><span>⚡</span><span>Higher-Order Functions</span><span class="sbn2">07</span></div>
+    <div class="sbi" onclick="go('col',this,8)"><span>📦</span><span>Collections &amp; Operators</span><span class="sbn2">08</span></div>
+    <div class="sbi" onclick="go('del',this,9)"><span>🔗</span><span>Delegation</span><span class="sbn2">09</span></div>
+    <div class="sbi" onclick="go('gen',this,10)"><span>🧬</span><span>Generics</span><span class="sbn2">10</span></div>
+    <div class="sbg">Architecture</div>
+    <div class="sbi" onclick="go('sol',this,11)"><span>🏛</span><span>SOLID Principles</span><span class="sbn2">11</span></div>
+  </div>
+</div>
+<div id="main"><div class="ct">
+
+<div class="sec active" id="s-vis">
+<div class="thd"><div class="ttag">Section 01 · Kotlin Core</div>
+<div class="ttl">Visibility Modifiers</div>
+<div class="tdesc">Controls who can access a class, function, or property. Each modifier explained separately with single-module and multi-module examples.</div></div>
+
+<table><thead><tr><th>Modifier</th><th>Class Level</th><th>File / Top Level</th><th>Key Point</th></tr></thead>
+<tbody>
+<tr><td><strong style="color:var(--ac3)">public</strong></td><td>Everywhere</td><td>Everywhere</td><td>Default — write nothing</td></tr>
+<tr><td><strong style="color:var(--red)">private</strong></td><td>Same class only</td><td>Same file only</td><td>Strictest scope</td></tr>
+<tr><td><strong style="color:var(--warn)">protected</strong></td><td>Class + subclasses</td><td>❌ Not allowed</td><td>Inheritance only</td></tr>
+<tr><td><strong style="color:var(--ac2)">internal</strong></td><td>Same Gradle module</td><td>Same Gradle module</td><td>Unique to Kotlin</td></tr>
+</tbody></table>
+<hr class="div"/>
+
+<!-- PUBLIC -->
+<div class="con">
+<div class="cttl green">1. public <span class="bdg b2">default</span></div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>public</strong> is the default visibility in Kotlin. If you write no modifier, it is public. A public class, function, or property can be accessed from <strong>any class, any file, any module</strong>. Writing public explicitly is optional — most style guides omit it.</div></div>
+<div class="exp"><div class="lbl">Expanding Further</div>
+<div class="et">In Android your <strong>Repository interfaces</strong>, <strong>ViewModel StateFlow</strong>, and <strong>ApiService interface</strong> are public because different layers of your app need them. Public = zero restriction anywhere in the project.</div></div>
+
+<div class="exp"><div class="lbl">Single Module Example</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — single module</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// UserRepository.kt — public by default</span>
+<span class="kw">class</span> <span class="cls">UserRepository</span> {                      <span class="cm">// accessible everywhere</span>
+    <span class="kw">fun</span> <span class="fn">getUser</span>(id: <span class="cls">String</span>): <span class="cls">User</span> { ... }   <span class="cm">// public by default</span>
+}
+
+<span class="kw">fun</span> <span class="fn">formatDate</span>(ts: <span class="cls">Long</span>): <span class="cls">String</span> = <span class="str">"..."</span>   <span class="cm">// public top-level fn</span>
+
+<span class="cm">// MainActivity.kt — same module, different file</span>
+<span class="kw">class</span> <span class="cls">MainActivity</span> : <span class="cls">AppCompatActivity</span>() {
+    <span class="kw">val</span> repo = <span class="cls">UserRepository</span>()              <span class="cm">// ✅ public — works</span>
+    <span class="kw">val</span> d = <span class="fn">formatDate</span>(<span class="num">123456789L</span>)           <span class="cm">// ✅ public — works</span>
+}</pre></div>
+
+<div class="exp"><div class="lbl">Multi-Module Example</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — :core:network module</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// :core:network module — ApiService.kt</span>
+<span class="kw">interface</span> <span class="cls">ApiService</span> {                        <span class="cm">// public — other modules need this</span>
+    <span class="ann">@GET</span>(<span class="str">"users/{id}"</span>)
+    <span class="kw">suspend fun</span> <span class="fn">getUser</span>(<span class="ann">@Path</span>(<span class="str">"id"</span>) id: <span class="cls">Int</span>): <span class="cls">User</span>
+}</pre></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — :feature:home module (consumer)</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// :feature:home module — can access ApiService because it's public</span>
+<span class="kw">class</span> <span class="cls">HomeViewModel</span> <span class="ann">@Inject</span> <span class="kw">constructor</span>(
+    <span class="kw">private val</span> api: <span class="cls">ApiService</span>  <span class="cm">// ✅ public interface — accessible cross-module</span>
+) : <span class="cls">ViewModel</span>() { ... }</pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Interview Q&amp;A</div>
+<div class="qa"><div class="q">Q: Do you need to write public explicitly in Kotlin?</div>
+<div class="a">No. public is the default. Writing it is optional. Most Kotlin style guides omit it to reduce noise, unless the team wants to make visibility intent very explicit across a large codebase.</div></div></div>
+</div>
+<hr class="div"/>
+
+<!-- PRIVATE -->
+<div class="con">
+<div class="cttl red">2. private <span class="bdg b5">strictest</span></div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>private</strong> is the strictest modifier. At <strong>class level</strong> — accessible only inside that class. Even subclasses cannot see it. At <strong>file/top level</strong> — accessible only inside that exact .kt file.</div></div>
+<div class="exp"><div class="lbl">Expanding Further — Why private in ViewModel</div>
+<div class="et">The most important Android use of private is the <strong>MutableStateFlow / MutableLiveData pattern</strong>. Only ViewModel should mutate state. If MutableStateFlow were public, any Fragment or Composable could call <strong>.value = ...</strong> directly — bypassing ViewModel and breaking the single-source-of-truth principle.</div></div>
+
+<div class="exp"><div class="lbl">Class Level Example</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — private at class level</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">class</span> <span class="cls">LoginViewModel</span> : <span class="cls">ViewModel</span>() {
+    <span class="cm">// private — only THIS class can mutate state</span>
+    <span class="kw">private val</span> _uiState = <span class="cls">MutableStateFlow</span>&lt;<span class="cls">LoginUiState</span>&gt;(<span class="cls">LoginUiState</span>.<span class="cls">Idle</span>)
+    <span class="cm">// public — anyone can observe, but NOT mutate</span>
+    <span class="kw">val</span> uiState: <span class="cls">StateFlow</span>&lt;<span class="cls">LoginUiState</span>&gt; = _uiState.<span class="fn">asStateFlow</span>()
+
+    <span class="kw">private fun</span> <span class="fn">validateEmail</span>(email: <span class="cls">String</span>) = email.<span class="fn">contains</span>(<span class="str">"@"</span>)
+
+    <span class="kw">fun</span> <span class="fn">login</span>(email: <span class="cls">String</span>, pass: <span class="cls">String</span>) {
+        <span class="kw">if</span> (!<span class="fn">validateEmail</span>(email)) <span class="kw">return</span>   <span class="cm">// ✅ same class</span>
+        _uiState.<span class="fn">value</span> = <span class="cls">LoginUiState</span>.<span class="cls">Loading</span>    <span class="cm">// ✅ same class</span>
+    }
+}
+
+<span class="kw">class</span> <span class="cls">LoginScreen</span> {
+    <span class="kw">val</span> vm = <span class="cls">LoginViewModel</span>()
+    <span class="cm">// vm._uiState         ❌ private — compiler error</span>
+    <span class="cm">// vm.validateEmail()  ❌ private — compiler error</span>
+    <span class="cm">// vm.uiState          ✅ public — can observe</span>
+}</pre></div>
+
+<div class="exp"><div class="lbl">File Level Example</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — private at file level</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// NetworkUtils.kt</span>
+<span class="kw">private fun</span> <span class="fn">buildAuthHeader</span>(token: <span class="cls">String</span>) =
+    <span class="fn">mapOf</span>(<span class="str">"Authorization"</span> <span class="kw">to</span> <span class="str">"Bearer $token"</span>)   <span class="cm">// only inside NetworkUtils.kt</span>
+
+<span class="kw">fun</span> <span class="fn">createOkHttp</span>(token: <span class="cls">String</span>): <span class="cls">OkHttpClient</span> {
+    <span class="kw">val</span> headers = <span class="fn">buildAuthHeader</span>(token)          <span class="cm">// ✅ same file</span>
+    <span class="kw">return</span> <span class="cls">OkHttpClient</span>.<span class="cls">Builder</span>().<span class="fn">addInterceptor</span> {
+        it.<span class="fn">proceed</span>(it.<span class="fn">request</span>().<span class="fn">newBuilder</span>().<span class="fn">headers</span>(<span class="cls">Headers</span>.<span class="fn">of</span>(headers)).<span class="fn">build</span>())
+    }.<span class="fn">build</span>()
+}
+
+<span class="cm">// MainActivity.kt</span>
+<span class="cm">// buildAuthHeader("xyz")  ❌ private top-level — not accessible</span></pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Interview Q&amp;A</div>
+<div class="qa"><div class="q">Q: Why private MutableStateFlow + public StateFlow in ViewModel?</div>
+<div class="a">Encapsulation and MVVM contract. Only ViewModel should change UI state — that is its job. Exposing MutableStateFlow lets any subscriber mutate state directly, bypassing ViewModel, breaking the single-source-of-truth principle that makes MVVM testable.</div></div>
+<div class="qa"><div class="q">Q: What is the difference between private at class level vs file level?</div>
+<div class="a">Class level private: only that class body can access it — not even subclasses. File level private: the top-level declaration is visible only within that .kt file, to all code in the file regardless of class.</div></div></div>
+</div>
+<hr class="div"/>
+
+<!-- PROTECTED -->
+<div class="con">
+<div class="cttl yellow">3. protected <span class="bdg b4">inheritance only</span></div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>protected</strong> is accessible inside the declaring class AND all subclasses. It is <strong>NOT available at top/file level</strong> — using it there is a compile error. It exists purely for class hierarchy sharing.</div></div>
+<div class="exp"><div class="lbl">Single Module Example</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — single module</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// BaseViewModel.kt</span>
+<span class="kw">abstract class</span> <span class="cls">BaseViewModel</span> : <span class="cls">ViewModel</span>() {
+    <span class="cm">// protected — subclasses share this, outside world cannot access</span>
+    <span class="kw">protected val</span> _loading = <span class="cls">MutableStateFlow</span>(<span class="kw">false</span>)
+    <span class="kw">val</span> loading = _loading.<span class="fn">asStateFlow</span>()
+
+    <span class="kw">protected fun</span> <span class="fn">handleError</span>(t: <span class="cls">Throwable</span>): <span class="cls">String</span> = <span class="kw">when</span> (t) {
+        <span class="kw">is</span> <span class="cls">IOException</span>    -> <span class="str">"No internet"</span>
+        <span class="kw">is</span> <span class="cls">HttpException</span>  -> <span class="str">"Server error: ${t.code()}"</span>
+        <span class="kw">else</span>              -> <span class="str">"Something went wrong"</span>
+    }
+}
+
+<span class="cm">// UserViewModel.kt — same module, subclass</span>
+<span class="kw">class</span> <span class="cls">UserViewModel</span>(
+    <span class="kw">private val</span> repo: <span class="cls">UserRepository</span>
+) : <span class="cls">BaseViewModel</span>() {
+    <span class="kw">fun</span> <span class="fn">fetchUser</span>(id: <span class="cls">String</span>) {
+        viewModelScope.<span class="fn">launch</span> {
+            _loading.<span class="fn">value</span> = <span class="kw">true</span>             <span class="cm">// ✅ protected — subclass access</span>
+            repo.<span class="fn">getUser</span>(id).<span class="fn">onFailure</span> {
+                <span class="fn">println</span>(<span class="fn">handleError</span>(it))      <span class="cm">// ✅ protected — subclass access</span>
+            }
+            _loading.<span class="fn">value</span> = <span class="kw">false</span>
+        }
+    }
+}
+
+<span class="cm">// HomeFragment.kt — same module, NOT a subclass</span>
+<span class="kw">class</span> <span class="cls">HomeFragment</span> : <span class="cls">Fragment</span>() {
+    <span class="kw">val</span> vm: <span class="cls">UserViewModel</span> <span class="kw">by</span> <span class="fn">viewModels</span>()
+    <span class="cm">// vm.handleError(...)  ❌ protected — Fragment is not a subclass</span>
+    <span class="cm">// vm.loading.collect   ✅ public StateFlow — accessible</span>
+}</pre></div>
+
+<div class="exp"><div class="lbl">Multi-Module Example</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — :core:ui module (BaseFragment)</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// :core:ui module</span>
+<span class="kw">abstract class</span> <span class="cls">BaseFragment</span> : <span class="cls">Fragment</span>() {
+    <span class="kw">protected fun</span> <span class="fn">showSnackbar</span>(msg: <span class="cls">String</span>) {
+        <span class="cls">Snackbar</span>.<span class="fn">make</span>(requireView(), msg, <span class="cls">Snackbar</span>.LENGTH_SHORT).<span class="fn">show</span>()
+    }
+    <span class="kw">protected fun</span> <span class="fn">navigateTo</span>(directions: <span class="cls">NavDirections</span>) {
+        <span class="fn">findNavController</span>().<span class="fn">navigate</span>(directions)
+    }
+}</pre></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — :feature:home module (consumer)</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// :feature:home module — HomeFragment extends BaseFragment</span>
+<span class="kw">class</span> <span class="cls">HomeFragment</span> : <span class="cls">BaseFragment</span>() {  <span class="cm">// subclass — cross-module</span>
+    <span class="kw">override fun</span> <span class="fn">onViewCreated</span>(view: <span class="cls">View</span>, ...) {
+        <span class="fn">showSnackbar</span>(<span class="str">"Welcome!"</span>)           <span class="cm">// ✅ protected — subclass access works cross-module</span>
+        <span class="fn">navigateTo</span>(HomeFragmentDirections.<span class="fn">toDetail</span>())
+    }
+}</pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Interview Q&amp;A</div>
+<div class="qa"><div class="q">Q: Can protected be used at top level in a Kotlin file?</div>
+<div class="a">No. protected at top level is a compile error. protected only makes sense in a class hierarchy — there is no inheritance concept at file level. For file-level restriction use private or internal.</div></div>
+<div class="qa"><div class="q">Q: Does protected work across modules in multi-module projects?</div>
+<div class="a">Yes. If a class in :feature:home extends a class from :core:ui, it can access protected members from the parent — even though they are in different Gradle modules. protected is about inheritance, not module boundaries.</div></div></div>
+</div>
+<hr class="div"/>
+
+<!-- INTERNAL -->
+<div class="con">
+<div class="cttl purple">4. internal <span class="bdg b3">unique to Kotlin</span></div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>internal</strong> restricts access to the same <strong>Gradle module</strong>. There is no Java equivalent. Designed specifically for <strong>multi-module Android projects</strong> — hide your implementations inside a module while keeping the interface public for others to depend on.</div></div>
+<div class="exp"><div class="lbl">Expanding Further</div>
+<div class="et">internal is the key to enforcing clean architecture at the Gradle level. You expose only interfaces publicly. Concrete implementations stay internal. Other modules <strong>cannot</strong> bypass your architecture by directly instantiating your concrete classes — the compiler prevents it.</div></div>
+
+<div class="exp"><div class="lbl">Single Module Example</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — single module</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// In a single-module app, internal = same module = entire app</span>
+<span class="cm">// Useful to hide implementation from test code or to signal intent</span>
+
+<span class="kw">internal class</span> <span class="cls">TokenRefreshManager</span>(
+    <span class="kw">private val</span> prefs: <span class="cls">SharedPreferences</span>
+) {
+    <span class="kw">internal fun</span> <span class="fn">refreshIfExpired</span>() { ... }
+}
+
+<span class="cm">// Can be used in same module freely</span>
+<span class="kw">class</span> <span class="cls">AuthInterceptor</span> <span class="ann">@Inject</span> <span class="kw">constructor</span>(
+    <span class="kw">private val</span> tokenManager: <span class="cls">TokenRefreshManager</span>  <span class="cm">// ✅ same module</span>
+) : <span class="cls">Interceptor</span> { ... }</pre></div>
+
+<div class="exp"><div class="lbl">Multi-Module Example — The Main Use Case</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — :core:data module</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// :core:data module</span>
+
+<span class="cm">// PUBLIC interface — contract exposed to all modules</span>
+<span class="kw">interface</span> <span class="cls">UserRepository</span> {
+    <span class="kw">suspend fun</span> <span class="fn">getUser</span>(id: <span class="cls">String</span>): <span class="cls">Result</span>&lt;<span class="cls">User</span>&gt;
+    <span class="kw">suspend fun</span> <span class="fn">saveUser</span>(user: <span class="cls">User</span>)
+}
+
+<span class="cm">// INTERNAL implementation — hidden from :feature, :app</span>
+<span class="kw">internal class</span> <span class="cls">UserRepositoryImpl</span>(
+    <span class="kw">private val</span> api: <span class="cls">ApiService</span>,
+    <span class="kw">private val</span> dao: <span class="cls">UserDao</span>
+) : <span class="cls">UserRepository</span> {
+    <span class="kw">override suspend fun</span> <span class="fn">getUser</span>(id: <span class="cls">String</span>) = <span class="fn">runCatching</span> { api.<span class="fn">getUser</span>(id) }
+    <span class="kw">override suspend fun</span> <span class="fn">saveUser</span>(user: <span class="cls">User</span>) = dao.<span class="fn">insert</span>(user)
+}
+
+<span class="cm">// INTERNAL Hilt module — wires interface → implementation inside :core:data</span>
+<span class="ann">@Module</span>
+<span class="ann">@InstallIn</span>(<span class="cls">SingletonComponent</span>::<span class="kw">class</span>)
+<span class="kw">internal abstract class</span> <span class="cls">DataModule</span> {
+    <span class="ann">@Binds</span> <span class="ann">@Singleton</span>
+    <span class="kw">abstract fun</span> <span class="fn">bindUserRepo</span>(impl: <span class="cls">UserRepositoryImpl</span>): <span class="cls">UserRepository</span>
+}</pre></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — :feature:home module (consumer)</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// :feature:home module</span>
+<span class="ann">@HiltViewModel</span>
+<span class="kw">class</span> <span class="cls">HomeViewModel</span> <span class="ann">@Inject</span> <span class="kw">constructor</span>(
+    <span class="kw">private val</span> repo: <span class="cls">UserRepository</span>  <span class="cm">// ✅ public interface — accessible</span>
+) : <span class="cls">ViewModel</span>() {
+    <span class="cm">// val impl = UserRepositoryImpl(...)  ❌ internal — compile error</span>
+    <span class="cm">// DataModule is internal — :feature cannot see the binding setup</span>
+    <span class="cm">// But Hilt provides UserRepository via the public interface automatically</span>
+}</pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Interview Q&amp;A</div>
+<div class="qa"><div class="q">Q: Difference between private and internal?</div>
+<div class="a"><strong>private</strong> restricts to the same class or same file. <strong>internal</strong> restricts to the same Gradle module — which can have hundreds of files and classes. internal is module-level encapsulation, private is class/file-level encapsulation.</div></div>
+<div class="qa"><div class="q">Q: Why is internal important in multi-module Android?</div>
+<div class="a">It enforces clean architecture at compile time. You expose only interfaces publicly. Implementations stay internal. Other modules cannot bypass your architecture by instantiating your concrete classes directly. This is Gradle-level boundary enforcement — not just a convention.</div></div>
+<div class="qa"><div class="q">Q: If I mark a class internal in :core:data, can :app module access it?</div>
+<div class="a">No. :app is a separate Gradle module. internal is scoped to the module it is declared in. Even if :app depends on :core:data in build.gradle, it still cannot access internal classes from :core:data — the compiler blocks it.</div></div></div>
+</div>
+<div class="nv">
+<button class="nb nn" onclick="go('oop',document.querySelectorAll('.sbi')[1],2)">OOP Fundamentals →</button>
+</div>
+</div>
+
+<div class="sec" id="s-oop">
+<div class="thd"><div class="ttag">Section 02 · Kotlin Core</div><div class="ttl">OOP Fundamentals</div>
+<div class="tdesc">val/var, open/abstract/sealed, data class, object, companion object.</div></div>
+
+<div class="con"><div class="cttl">val vs var</div>
+<div class="def"><div class="lbl">Definition</div><div class="dt"><strong>val</strong> — declares a <strong>read-only property</strong>. The reference cannot be reassigned once set. However if the object it points to is mutable, its internal state can still change.</div></div>
+<div class="exp"><div class="lbl">Expanding Further</div><div class="et"><strong>val</strong> compiles to a Java <strong>final</strong> variable — the reference is fixed, not object content. <strong>var</strong> is mutable and can be reassigned any number of times. <strong>const val</strong> is evaluated at compile time, only primitives and String, must be top-level or in companion object.</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">val</span> list = <span class="fn">mutableListOf</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>)
+list.<span class="fn">add</span>(<span class="num">4</span>)         <span class="cm">// ✅ internal state changed</span>
+<span class="cm">// list = mutableListOf()  ❌ reference reassignment — compiler error</span>
+
+<span class="kw">var</span> count = <span class="num">0</span>; count = <span class="num">5</span>   <span class="cm">// ✅ allowed</span>
+
+<span class="kw">const val</span> BASE_URL = <span class="str">"https://api.example.com"</span>  <span class="cm">// compile-time, inlined everywhere</span>
+<span class="kw">val</span> token = <span class="fn">fetchToken</span>()                         <span class="cm">// runtime value</span></pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: val cannot be reassigned — how is it different from const val?</div>
+<div class="a"><strong>val</strong> is evaluated at runtime and can hold any object. <strong>const val</strong> is evaluated at compile time, limited to primitives and String, and the compiler inlines it at every usage site — zero runtime overhead.</div></div></div></div>
+<hr class="div"/>
+
+<div class="con"><div class="cttl">open / abstract / sealed</div>
+<div class="def"><div class="lbl">Definition</div><div class="dt">In Kotlin <strong>all classes are final by default</strong>. These three keywords unlock different kinds of class hierarchy behavior.</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — open</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">open class</span> <span class="cls">BaseFragment</span> : <span class="cls">Fragment</span>() {
+    <span class="kw">open fun</span> <span class="fn">showLoader</span>() = <span class="fn">println</span>(<span class="str">"Showing loader"</span>)  <span class="cm">// can override</span>
+    <span class="kw">fun</span> <span class="fn">hideKeyboard</span>() { }                              <span class="cm">// NOT open</span>
+}
+<span class="kw">class</span> <span class="cls">HomeFragment</span> : <span class="cls">BaseFragment</span>() {
+    <span class="kw">override fun</span> <span class="fn">showLoader</span>() = <span class="fn">println</span>(<span class="str">"Custom loader"</span>)
+}</pre></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — abstract</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">abstract class</span> <span class="cls">BaseViewModel</span> : <span class="cls">ViewModel</span>() {
+    <span class="kw">abstract fun</span> <span class="fn">onScreenCreated</span>()  <span class="cm">// must implement</span>
+    <span class="kw">abstract fun</span> <span class="fn">onRetry</span>()
+    <span class="kw">protected fun</span> <span class="fn">handleError</span>(e: <span class="cls">Throwable</span>) = <span class="fn">println</span>(e.message)  <span class="cm">// shared</span>
+}
+<span class="kw">class</span> <span class="cls">UserViewModel</span>(val repo: <span class="cls">UserRepository</span>) : <span class="cls">BaseViewModel</span>() {
+    <span class="kw">override fun</span> <span class="fn">onScreenCreated</span>() { <span class="fn">fetchUser</span>() }
+    <span class="kw">override fun</span> <span class="fn">onRetry</span>() { <span class="fn">fetchUser</span>() }
+    <span class="kw">private fun</span> <span class="fn">fetchUser</span>() { }
+}</pre></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — sealed</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">sealed class</span> <span class="cls">UiState</span>&lt;<span class="kw">out</span> T&gt; {
+    <span class="kw">object</span> <span class="cls">Loading</span> : <span class="cls">UiState</span>&lt;<span class="cls">Nothing</span>&gt;()
+    <span class="kw">data class</span> <span class="cls">Success</span>&lt;T&gt;(<span class="kw">val</span> data: T) : <span class="cls">UiState</span>&lt;T&gt;()
+    <span class="kw">data class</span> <span class="cls">Error</span>(<span class="kw">val</span> msg: <span class="cls">String</span>) : <span class="cls">UiState</span>&lt;<span class="cls">Nothing</span>&gt;()
+}
+<span class="kw">fun</span> <span class="fn">render</span>(state: <span class="cls">UiState</span>&lt;<span class="cls">User</span>&gt;) {
+    <span class="kw">when</span> (state) {  <span class="cm">// no else — exhaustive</span>
+        <span class="kw">is</span> <span class="cls">UiState</span>.<span class="cls">Loading</span>  -> <span class="fn">showLoader</span>()
+        <span class="kw">is</span> <span class="cls">UiState</span>.<span class="cls">Success</span>  -> <span class="fn">showData</span>(state.data)
+        <span class="kw">is</span> <span class="cls">UiState</span>.<span class="cls">Error</span>    -> <span class="fn">showError</span>(state.msg)
+    }
+}</pre></div>
+<table><thead><tr><th></th><th>open</th><th>abstract</th><th>sealed</th></tr></thead>
+<tbody>
+<tr><td>Instantiate?</td><td>✅ Yes</td><td>❌ No</td><td>❌ No</td></tr>
+<tr><td>Must override?</td><td>Optional</td><td>Abstract methods: Yes</td><td>Yes</td></tr>
+<tr><td>Subclasses anywhere?</td><td>✅ Yes</td><td>✅ Yes</td><td>❌ Same package</td></tr>
+<tr><td>Best for</td><td>Base classes</td><td>Force contracts</td><td>UI States / Results</td></tr>
+</tbody></table>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: Why are Kotlin classes final by default?</div>
+<div class="a">Effective Java Item 17: design and document for inheritance or prohibit it. Kotlin enforces this — accidental inheritance causes hard-to-find bugs. You must explicitly mark open to allow subclassing, making intent clear.</div></div>
+<div class="qa"><div class="q">Q: When would you use sealed over enum?</div>
+<div class="a">When each case needs to carry different data. enum values are simple constants. sealed subclasses can each hold different types: Success&lt;T&gt; holds data, Error holds a message String. Enums cannot do this.</div></div></div></div>
+<hr class="div"/>
+
+<div class="con"><div class="cttl">data class</div>
+<div class="def"><div class="lbl">Definition</div><div class="dt">A <strong>data class</strong> is designed to hold data. Kotlin auto-generates 5 things: <strong>equals()</strong>, <strong>hashCode()</strong>, <strong>toString()</strong>, <strong>copy()</strong>, and <strong>componentN()</strong> for destructuring.</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">data class</span> <span class="cls">User</span>(<span class="kw">val</span> id: <span class="cls">Int</span>, <span class="kw">val</span> name: <span class="cls">String</span>, <span class="kw">val</span> email: <span class="cls">String</span>)
+
+<span class="kw">val</span> u1 = <span class="cls">User</span>(<span class="num">1</span>, <span class="str">"John"</span>, <span class="str">"john@gmail.com"</span>)
+<span class="kw">val</span> u2 = <span class="cls">User</span>(<span class="num">1</span>, <span class="str">"John"</span>, <span class="str">"john@gmail.com"</span>)
+u1 == u2    <span class="cm">// true  — structural equality</span>
+u1 === u2   <span class="cm">// false — different objects in memory</span>
+<span class="kw">val</span> u3 = u1.<span class="fn">copy</span>(name = <span class="str">"Jane"</span>)       <span class="cm">// shallow copy, only name changed</span>
+<span class="kw">val</span> (id, name) = u1                    <span class="cm">// destructuring via componentN()</span></pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: Which properties are included in equals and hashCode?</div>
+<div class="a">Only properties in the <strong>primary constructor</strong>. Properties declared in the class body are NOT included — a common interview trap.</div></div>
+<div class="qa"><div class="q">Q: What is the trap with mutable var fields in data class?</div>
+<div class="a">Two equal objects can become unequal after mutation. copy() is shallow — nested mutable objects are shared references. Always prefer val in data classes.</div></div></div></div>
+<hr class="div"/>
+
+<div class="con"><div class="cttl">object vs companion object</div>
+<div class="def"><div class="lbl">Definition</div><div class="dt"><strong>object</strong> declares a singleton — one instance, lazily created on first access. <strong>companion object</strong> is tied to its class and provides Kotlin's equivalent of Java static members.</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// object — standalone singleton</span>
+<span class="kw">object</span> <span class="cls">AppAnalytics</span> {
+    <span class="kw">fun</span> <span class="fn">log</span>(event: <span class="cls">String</span>) { <span class="fn">println</span>(event) }
+}
+<span class="cls">AppAnalytics</span>.<span class="fn">log</span>(<span class="str">"screen_open"</span>)  <span class="cm">// no instantiation needed</span>
+
+<span class="cm">// companion object — Kotlin "static"</span>
+<span class="kw">class</span> <span class="cls">UserViewModel</span>(<span class="kw">private val</span> repo: <span class="cls">UserRepository</span>) : <span class="cls">ViewModel</span>() {
+    <span class="kw">companion object</span> {
+        <span class="kw">private const val</span> TAG = <span class="str">"UserViewModel"</span>
+        <span class="kw">fun</span> <span class="fn">factory</span>(repo: <span class="cls">UserRepository</span>) = <span class="kw">object</span> : <span class="cls">ViewModelProvider</span>.<span class="cls">Factory</span> {
+            <span class="kw">override fun</span> &lt;T : <span class="cls">ViewModel</span>&gt; <span class="fn">create</span>(cls: <span class="cls">Class</span>&lt;T&gt;): T {
+                <span class="ann">@Suppress</span>(<span class="str">"UNCHECKED_CAST"</span>)
+                <span class="kw">return</span> <span class="cls">UserViewModel</span>(repo) <span class="kw">as</span> T
+            }
+        }
+    }
+}
+<span class="cls">UserViewModel</span>.<span class="fn">factory</span>(repo)  <span class="cm">// called on class, not instance</span></pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: JVM difference between object and companion object?</div>
+<div class="a"><strong>object</strong> compiles to a class with a static INSTANCE field — true lazy singleton. <strong>companion object</strong> compiles to a static nested class inside the enclosing class. Both can implement interfaces — unlike Java static methods.</div></div></div></div>
+<div class="nv">
+<button class="nb np" onclick="go('vis',document.querySelectorAll('.sbi')[0],1)">← Visibility Modifiers</button>
+<button class="nb nn" onclick="go('ext',document.querySelectorAll('.sbi')[2],3)">Extension Functions →</button>
+</div></div>
+
+<div class="sec" id="s-ext">
+<div class="thd"><div class="ttag">Section 03 · Kotlin Core</div><div class="ttl">Extension Functions</div>
+<div class="tdesc">Add new functions to existing classes without modifying or inheriting from them.</div></div>
+<div class="con"><div class="cttl">What is an Extension Function?</div>
+<div class="def"><div class="lbl">Definition</div><div class="dt">An <strong>extension function</strong> lets you add a new function to an existing class without modifying the class or using inheritance. The class being extended is the <strong>receiver type</strong>, accessed as <strong>this</strong> inside the function.</div></div>
+<div class="exp"><div class="lbl">Expanding Further — Bytecode Level</div><div class="et">Extension functions compile to a <strong>static method</strong> with the receiver as the first parameter. They do NOT modify the class and have NO access to private or protected members — only public members.</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — basic syntax</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">fun</span> <span class="cls">String</span>.<span class="fn">isValidEmail</span>(): <span class="cls">Boolean</span> =
+    <span class="kw">this</span>.<span class="fn">contains</span>(<span class="str">"@"</span>) &amp;&amp; <span class="kw">this</span>.<span class="fn">contains</span>(<span class="str">"."</span>)
+
+<span class="kw">fun</span> <span class="cls">Int</span>.<span class="fn">dpToPx</span>(density: <span class="cls">Float</span>): <span class="cls">Int</span> = (<span class="kw">this</span> * density + <span class="num">0.5f</span>).<span class="fn">toInt</span>()
+
+<span class="str">"user@gmail.com"</span>.<span class="fn">isValidEmail</span>()  <span class="cm">// true</span>
+<span class="num">16</span>.<span class="fn">dpToPx</span>(<span class="num">3.0f</span>)                   <span class="cm">// 48</span>
+<span class="cm">// Compiles to: ExtensionsKt.isValidEmail("user@gmail.com")</span></pre></div></div>
+<hr class="div"/>
+<div class="con"><div class="cttl">Android Platform Extensions</div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">fun</span> <span class="cls">Context</span>.<span class="fn">toast</span>(msg: <span class="cls">String</span>) =
+    <span class="cls">Toast</span>.<span class="fn">makeText</span>(<span class="kw">this</span>, msg, <span class="cls">Toast</span>.LENGTH_SHORT).<span class="fn">show</span>()
+
+<span class="kw">fun</span> <span class="cls">View</span>.<span class="fn">show</span>() { visibility = <span class="cls">View</span>.VISIBLE }
+<span class="kw">fun</span> <span class="cls">View</span>.<span class="fn">hide</span>() { visibility = <span class="cls">View</span>.GONE }
+
+<span class="kw">fun</span> <span class="cls">Fragment</span>.<span class="fn">hideKeyboard</span>() {
+    <span class="kw">val</span> imm = requireContext().<span class="fn">getSystemService</span>(<span class="cls">Context</span>.INPUT_METHOD_SERVICE)
+                <span class="kw">as</span> <span class="cls">InputMethodManager</span>
+    imm.<span class="fn">hideSoftInputFromWindow</span>(view?.windowToken, <span class="num">0</span>)
+}
+
+<span class="kw">class</span> <span class="cls">UserFragment</span> : <span class="cls">Fragment</span>() {
+    <span class="kw">override fun</span> <span class="fn">onViewCreated</span>(view: <span class="cls">View</span>, ...) {
+        progressBar.<span class="fn">show</span>(); errorText.<span class="fn">hide</span>(); <span class="fn">toast</span>(<span class="str">"Welcome!"</span>); <span class="fn">hideKeyboard</span>()
+    }
+}</pre></div></div>
+<hr class="div"/>
+<div class="con"><div class="cttl">Extension Properties + Nullable Extensions</div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// Extension property — computed, no backing field</span>
+<span class="kw">val</span> <span class="cls">Int</span>.dp: <span class="cls">Float</span>
+    <span class="kw">get</span>() = <span class="kw">this</span> * <span class="cls">Resources</span>.<span class="fn">getSystem</span>().<span class="fn">displayMetrics</span>.density
+
+<span class="kw">val</span> padding = <span class="num">16</span>.dp  <span class="cm">// computed each access</span>
+
+<span class="cm">// Extension on nullable type — safe to call without ?.</span>
+<span class="kw">fun</span> <span class="cls">String</span>?.<span class="fn">orDefault</span>(default: <span class="cls">String</span> = <span class="str">""</span>): <span class="cls">String</span> = <span class="kw">this</span> ?: default
+
+<span class="kw">val</span> name: <span class="cls">String</span>? = <span class="kw">null</span>
+<span class="fn">println</span>(name.<span class="fn">orDefault</span>(<span class="str">"Guest"</span>))  <span class="cm">// "Guest" — no crash</span></pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: Can extension functions access private members?</div>
+<div class="a">No. Extension functions compile to static methods outside the class. They can only access public members. This is a fundamental limitation distinguishing them from actual class members.</div></div>
+<div class="qa"><div class="q">Q: Member function vs extension function — same signature — which wins?</div>
+<div class="a">The <strong>member function always wins</strong>. Extension functions are only resolved when no matching member exists. Member functions have higher priority at all times.</div></div></div></div>
+<div class="nv">
+<button class="nb np" onclick="go('oop',document.querySelectorAll('.sbi')[1],2)">← OOP Fundamentals</button>
+<button class="nb nn" onclick="go('nul',document.querySelectorAll('.sbi')[3],4)">Null Safety →</button>
+</div></div>
+
+<div class="sec" id="s-nul">
+<div class="thd"><div class="ttag">Section 04 · Kotlin Core</div><div class="ttl">Null Safety &amp; Types</div>
+<div class="tdesc">Kotlin eliminates NullPointerException at compile time. Nothing, Unit, smart casts.</div></div>
+<div class="con"><div class="cttl">Nullable vs Non-nullable</div>
+<div class="def"><div class="lbl">Definition</div><div class="dt">Every type in Kotlin is <strong>non-nullable by default</strong>. To allow null add <strong>?</strong>. The compiler then forces you to handle null — preventing NPEs at compile time.</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">val</span> name: <span class="cls">String</span> = <span class="str">"John"</span>   <span class="cm">// cannot be null</span>
+<span class="kw">val</span> nick: <span class="cls">String</span>? = <span class="kw">null</span>   <span class="cm">// can be null</span>
+
+nick?.length           <span class="cm">// safe call — null if nick is null</span>
+nick?.length ?: <span class="num">0</span>      <span class="cm">// Elvis — 0 if nick is null</span>
+nick!!.length           <span class="cm">// assertion — throws if null. Use sparingly.</span>
+
+<span class="kw">if</span> (nick != <span class="kw">null</span>) {
+    <span class="fn">println</span>(nick.length)   <span class="cm">// smart cast — no ?. needed</span>
+}
+nick?.<span class="fn">let</span> { <span class="fn">println</span>(<span class="str">"Nick: $it"</span>) }  <span class="cm">// runs only when non-null</span></pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: When would you use !! and why is it risky?</div>
+<div class="a">Only when 100% certain it cannot be null at that point. Risky because if wrong, you get KotlinNullPointerException with minimal context — same problem as Java NPE. Always prefer ?: or ?. instead.</div></div></div></div>
+<hr class="div"/>
+<div class="con"><div class="cttl">Nothing vs Unit</div>
+<div class="def"><div class="lbl">Definition</div><div class="dt"><strong>Unit</strong> — Kotlin equivalent of Java void. Returns no meaningful value. <strong>Nothing</strong> — a type representing a value that <strong>never exists</strong>. A function that always throws has return type Nothing.</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">fun</span> <span class="fn">logEvent</span>(e: <span class="cls">String</span>): <span class="cls">Unit</span> { <span class="fn">println</span>(e) }  <span class="cm">// Unit can be omitted</span>
+
+<span class="kw">fun</span> <span class="fn">fail</span>(msg: <span class="cls">String</span>): <span class="cls">Nothing</span> { <span class="kw">throw</span> <span class="cls">IllegalStateException</span>(msg) }
+
+<span class="kw">fun</span> <span class="fn">getToken</span>(): <span class="cls">String</span> =
+    prefs.<span class="fn">getString</span>(<span class="str">"token"</span>) ?: <span class="fn">fail</span>(<span class="str">"Token not found"</span>)
+    <span class="cm">// compiler knows fail() never returns — no type mismatch</span>
+
+<span class="kw">sealed class</span> <span class="cls">UiState</span>&lt;<span class="kw">out</span> T&gt; {
+    <span class="kw">data class</span> <span class="cls">Error</span>(<span class="kw">val</span> msg: <span class="cls">String</span>) : <span class="cls">UiState</span>&lt;<span class="cls">Nothing</span>&gt;()  <span class="cm">// no T needed</span>
+}</pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: Why is Nothing a subtype of every type?</div>
+<div class="a">Because Nothing means a value that never exists — it cannot violate any type contract. This is why throw expressions work in any position: <strong>val x: String = throw Exception()</strong> is valid because throw has type Nothing, a subtype of String.</div></div></div></div>
+<div class="nv">
+<button class="nb np" onclick="go('ext',document.querySelectorAll('.sbi')[2],3)">← Extension Functions</button>
+<button class="nb nn" onclick="go('lat',document.querySelectorAll('.sbi')[4],5)">lateinit vs lazy →</button>
+</div></div>
+
+<div class="sec" id="s-lat">
+<div class="thd"><div class="ttag">Section 05 · Kotlin Core</div><div class="ttl">lateinit vs by lazy</div>
+<div class="tdesc">Two ways to defer initialization. They solve completely different problems.</div></div>
+
+<div class="con"><div class="cttl green">lateinit — Manual Deferred Initialization</div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>lateinit</strong> tells the compiler: "I promise I will initialize this before I use it." Used for <strong>var</strong> properties that cannot be set in the constructor — common in Android because Activity, Fragment, and Service are created by the system, not by you.</div></div>
+<div class="exp"><div class="lbl">Expanding Further</div>
+<div class="et">In Android you cannot inject dependencies in a system-created constructor. <strong>onCreate()</strong> and <strong>onViewCreated()</strong> are your initialization points. If you access a lateinit property before initializing it, you get <strong>UninitializedPropertyAccessException</strong> — far more descriptive than a generic NPE, telling you exactly which property was not initialized.</div></div>
+
+<div class="exp"><div class="lbl">Use Case 1 — ViewBinding</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — ViewBinding with lateinit</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">class</span> <span class="cls">UserFragment</span> : <span class="cls">Fragment</span>() {
+    <span class="cm">// Cannot initialize here — inflater not available at class creation</span>
+    <span class="kw">private lateinit var</span> binding: <span class="cls">FragmentUserBinding</span>
+
+    <span class="kw">override fun</span> <span class="fn">onCreateView</span>(inflater, container, saved): <span class="cls">View</span> {
+        binding = <span class="cls">FragmentUserBinding</span>.<span class="fn">inflate</span>(inflater, container, <span class="kw">false</span>)
+        <span class="kw">return</span> binding.root   <span class="cm">// ✅ now initialized</span>
+    }
+
+    <span class="kw">override fun</span> <span class="fn">onViewCreated</span>(view: <span class="cls">View</span>, ...) {
+        binding.nameTextView.text = <span class="str">"John"</span>  <span class="cm">// ✅ safe — already initialized</span>
+    }
+}</pre></div>
+
+<div class="exp"><div class="lbl">Use Case 2 — Hilt Field Injection</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — Hilt @Inject with lateinit</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="ann">@AndroidEntryPoint</span>
+<span class="kw">class</span> <span class="cls">MainActivity</span> : <span class="cls">AppCompatActivity</span>() {
+    <span class="cm">// Hilt injects this after the object is created — must be lateinit</span>
+    <span class="ann">@Inject</span> <span class="kw">lateinit var</span> analytics: <span class="cls">AnalyticsManager</span>
+    <span class="ann">@Inject</span> <span class="kw">lateinit var</span> navigator: <span class="cls">AppNavigator</span>
+
+    <span class="kw">override fun</span> <span class="fn">onCreate</span>(saved: <span class="cls">Bundle</span>?) {
+        <span class="kw">super</span>.<span class="fn">onCreate</span>(saved)
+        analytics.<span class="fn">logScreenView</span>(<span class="str">"main"</span>)  <span class="cm">// ✅ Hilt has injected by now</span>
+    }
+}</pre></div>
+
+<div class="exp"><div class="lbl">Use Case 3 — RecyclerView Adapter</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — Adapter with lateinit</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">class</span> <span class="cls">UserFragment</span> : <span class="cls">Fragment</span>() {
+    <span class="kw">private lateinit var</span> adapter: <span class="cls">UserAdapter</span>  <span class="cm">// adapter changes as data changes</span>
+
+    <span class="kw">override fun</span> <span class="fn">onViewCreated</span>(view: <span class="cls">View</span>, ...) {
+        adapter = <span class="cls">UserAdapter</span> { user -> viewModel.<span class="fn">onUserSelected</span>(user) }
+        binding.recyclerView.adapter = adapter
+
+        <span class="cm">// Safe check before accessing</span>
+        <span class="kw">if</span> (::<span class="fn">adapter</span>.<span class="fn">isInitialized</span>) {
+            adapter.<span class="fn">submitList</span>(<span class="fn">emptyList</span>())
+        }
+    }
+}</pre></div>
+
+<div class="wrn">⚠️ <strong>lateinit restrictions:</strong> Only var (not val). Cannot be nullable types (String?). Cannot be primitives (Int, Boolean, Float) — use nullable (Int?) instead. Always initialize before first access.</div>
+</div>
+<hr class="div"/>
+
+<div class="con"><div class="cttl green">by lazy — Automatic Deferred Initialization</div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>by lazy</strong> computes the value on <strong>first access</strong> and caches it forever. The block runs exactly once. Used for <strong>val</strong> (immutable) properties that are expensive to create or depend on other initialized properties.</div></div>
+<div class="exp"><div class="lbl">Expanding Further — Internal Working</div>
+<div class="et">by lazy uses the <strong>Lazy&lt;T&gt;</strong> interface internally. Default mode is <strong>LazyThreadSafetyMode.SYNCHRONIZED</strong> — a lock ensures only one thread initializes it. After initialization, subsequent accesses skip the lock. The block stores either an uninitialized sentinel or the cached result.</div></div>
+
+<div class="exp"><div class="lbl">Use Case 1 — ViewModel via viewModels()</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">class</span> <span class="cls">UserFragment</span> : <span class="cls">Fragment</span>() {
+    <span class="cm">// viewModels() returns a lazy delegate — ViewModel created on first access</span>
+    <span class="kw">private val</span> viewModel: <span class="cls">UserViewModel</span> <span class="kw">by</span> <span class="fn">viewModels</span>()
+    <span class="cm">// If Fragment recreates, same ViewModel instance returned from ViewModelStore</span>
+}</pre></div>
+
+<div class="exp"><div class="lbl">Use Case 2 — Room Database in Application</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">class</span> <span class="cls">MyApp</span> : <span class="cls">Application</span>() {
+    <span class="cm">// Room is expensive — create once, share everywhere</span>
+    <span class="kw">val</span> database: <span class="cls">AppDatabase</span> <span class="kw">by</span> <span class="fn">lazy</span> {
+        <span class="cls">Room</span>.<span class="fn">databaseBuilder</span>(<span class="kw">this</span>, <span class="cls">AppDatabase</span>::<span class="kw">class</span>.java, <span class="str">"app_db"</span>)
+            .<span class="fn">fallbackToDestructiveMigration</span>()
+            .<span class="fn">build</span>()
+        <span class="cm">// Created only on first access, cached for entire app lifetime</span>
+    }
+}</pre></div>
+
+<div class="exp"><div class="lbl">Use Case 3 — Expensive Computation (Regex)</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">class</span> <span class="cls">InputValidator</span> {
+    <span class="cm">// Regex compilation is expensive — do it once</span>
+    <span class="kw">private val</span> emailRegex: <span class="cls">Regex</span> <span class="kw">by</span> <span class="fn">lazy</span> {
+        <span class="cls">Regex</span>(<span class="str">"^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\$"</span>)
+    }
+    <span class="cm">// Regex compiled on first call to isValidEmail(), then reused</span>
+    <span class="kw">fun</span> <span class="fn">isValidEmail</span>(email: <span class="cls">String</span>) = emailRegex.<span class="fn">matches</span>(email)
+}
+
+<span class="cm">// Thread safety modes</span>
+<span class="kw">val</span> safe <span class="kw">by</span> <span class="fn">lazy</span>(LazyThreadSafetyMode.SYNCHRONIZED) { <span class="fn">compute</span>() }  <span class="cm">// default</span>
+<span class="kw">val</span> fast <span class="kw">by</span> <span class="fn">lazy</span>(LazyThreadSafetyMode.NONE) { <span class="fn">compute</span>() }           <span class="cm">// no lock — single thread</span></pre></div>
+</div>
+<hr class="div"/>
+
+<div class="con"><div class="cttl">Comparison Table</div>
+<table><thead><tr><th>Property</th><th>lateinit var</th><th>by lazy val</th></tr></thead>
+<tbody>
+<tr><td>Mutability</td><td>var only</td><td>val only</td></tr>
+<tr><td>Initialization</td><td>Manual — you set it</td><td>Auto — on first access</td></tr>
+<tr><td>Thread safe</td><td>❌ No</td><td>✅ Yes (SYNCHRONIZED default)</td></tr>
+<tr><td>Primitives (Int, Boolean)</td><td>❌ Not allowed</td><td>✅ Allowed</td></tr>
+<tr><td>Nullable types</td><td>❌ Not allowed</td><td>✅ Allowed</td></tr>
+<tr><td>Check before access</td><td>::field.isInitialized</td><td>N/A — always ready</td></tr>
+<tr><td>Exception if unready</td><td>UninitializedPropertyAccessException</td><td>Never — block runs automatically</td></tr>
+<tr><td>Re-initializable?</td><td>✅ Yes — reassign anytime</td><td>❌ No — cached forever</td></tr>
+<tr><td>Android use case</td><td>ViewBinding, Adapter, @Inject field</td><td>ViewModel, Room, Retrofit, Regex</td></tr>
+</tbody></table>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: What exception is thrown when you access an uninitialized lateinit property?</div>
+<div class="a">UninitializedPropertyAccessException. It is more helpful than NPE because it tells you exactly which property was not initialized before access. Use ::field.isInitialized to guard access when unsure.</div></div>
+<div class="qa"><div class="q">Q: Why can't you use lateinit with primitives like Int?</div>
+<div class="a">lateinit uses null internally as the "uninitialized" sentinel. Kotlin primitives (Int, Boolean, Float) compile to JVM primitives which cannot hold null — so there is no way to mark them uninitialized. Use nullable Int? instead.</div></div>
+<div class="qa"><div class="q">Q: Can by lazy be re-initialized?</div>
+<div class="a">No. Once initialized, the cached value is returned forever. The block never runs again. If you need a property that can be reset, use lateinit var or a regular var with manual management.</div></div>
+<div class="qa"><div class="q">Q: Is by lazy always thread safe?</div>
+<div class="a">By default yes — it uses LazyThreadSafetyMode.SYNCHRONIZED which locks on the object during initialization. For single-threaded scenarios you can use LazyThreadSafetyMode.NONE for better performance by skipping the lock overhead.</div></div></div></div>
+<div class="nv">
+<button class="nb np" onclick="go('nul',document.querySelectorAll('.sbi')[3],4)">← Null Safety</button>
+<button class="nb nn" onclick="go('scp',document.querySelectorAll('.sbi')[5],6)">Scope Functions →</button>
+</div></div>
+
+<div class="sec" id="s-scp">
+<div class="thd"><div class="ttag">Section 06 · Kotlin Core</div><div class="ttl">Scope Functions</div>
+<div class="tdesc">5 functions — let, run, with, apply, also. Each explained with Definition → Purpose → Syntax → Android Example → IBM Q.</div></div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt">Scope functions execute a <strong>block of code in the context of an object</strong>. They do not add functionality — they make code readable by creating a temporary scope where you can work with an object without repeating its name. Kotlin has exactly <strong>5 scope functions</strong>.</div></div>
+<div class="tip"><strong>Memory trick:</strong> apply / also → return the <strong>object</strong>. let / run / with → return the <strong>lambda result</strong>. apply / run / with → use <strong>this</strong>. let / also → use <strong>it</strong>.</div>
+<table><thead><tr><th>Function</th><th>Refers as</th><th>Returns</th><th>Best for</th></tr></thead>
+<tbody>
+<tr><td><strong>let</strong></td><td>it</td><td>Lambda result</td><td>Null checks, transformation</td></tr>
+<tr><td><strong>run</strong></td><td>this</td><td>Lambda result</td><td>Compute result from object</td></tr>
+<tr><td><strong>with</strong></td><td>this</td><td>Lambda result</td><td>Multiple calls on non-null object</td></tr>
+<tr><td><strong>apply</strong></td><td>this</td><td>Object itself</td><td>Object configuration</td></tr>
+<tr><td><strong>also</strong></td><td>it</td><td>Object itself</td><td>Side effects — logging, analytics</td></tr>
+</tbody></table>
+<hr class="div"/>
+
+<!-- LET -->
+<div class="con"><div class="cttl">1. let</div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>let</strong> — refers to the object as <strong>it</strong>. Returns the <strong>lambda result</strong> (last line). Used primarily for null safety checks and transforming an object into something else.</div></div>
+<div class="exp"><div class="lbl">Purpose / When to Use</div>
+<div class="et">• Execute a block only when the object is <strong>non-null</strong><br/>
+• <strong>Transform</strong> an object into a different type<br/>
+• Introduce a temporary variable in a local scope without polluting the outer scope<br/>
+• <strong>Chain</strong> operations on an object</div></div>
+<div class="exp"><div class="lbl">Syntax</div>
+<div class="et"><code>val result = object?.let { it -> /* block */ lastLineReturned }</code></div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — let basic example</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">val</span> email: <span class="cls">String</span>? = <span class="fn">getEmailFromPrefs</span>()
+
+<span class="cm">// Null safety — block runs ONLY if email is non-null</span>
+email?.<span class="fn">let</span> { validEmail ->
+    viewModel.<span class="fn">login</span>(validEmail)
+} ?: <span class="fn">showError</span>(<span class="str">"Email not found"</span>)
+
+<span class="cm">// Transformation — let returns the last line</span>
+<span class="kw">val</span> displayName: <span class="cls">String</span> = user?.<span class="fn">let</span> {
+    <span class="str">"${it.name} (${it.email})"</span>  <span class="cm">// this String is returned from let</span>
+} ?: <span class="str">"Guest"</span></pre></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — let Android example</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// ViewModel — handle nullable API response safely</span>
+<span class="kw">fun</span> <span class="fn">processResponse</span>(response: <span class="cls">ApiResponse</span>&lt;<span class="cls">User</span>&gt;?) {
+    response?.<span class="fn">let</span> { res ->
+        <span class="kw">if</span> (res.<span class="fn">isSuccessful</span>())
+            _uiState.<span class="fn">value</span> = <span class="cls">UiState</span>.<span class="cls">Success</span>(res.body)
+        <span class="kw">else</span>
+            _uiState.<span class="fn">value</span> = <span class="cls">UiState</span>.<span class="cls">Error</span>(res.errorMessage)
+    } ?: <span class="kw">run</span> {
+        _uiState.<span class="fn">value</span> = <span class="cls">UiState</span>.<span class="cls">Error</span>(<span class="str">"Response was null"</span>)
+    }
+}
+
+<span class="cm">// Composable — show user data only when non-null</span>
+viewModel.user.<span class="fn">collectAsStateWithLifecycle</span>().<span class="fn">value</span>?.<span class="fn">let</span> { user ->
+    <span class="cls">Text</span>(text = user.name)
+    <span class="cls">Text</span>(text = user.email)
+}</pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: What does ?.let do differently from if (x != null)?</div>
+<div class="a">?.let is an expression — it returns a value and can be chained. if (x != null) is a statement. let also creates a local scope so the safe non-null object is available as it without being in the outer scope. It reads left-to-right and is composable.</div></div>
+<div class="qa"><div class="q">Q: What does let return?</div>
+<div class="a">The last expression in the lambda. If no meaningful last line, it returns Unit.</div></div></div></div>
+<hr class="div"/>
+
+<!-- RUN -->
+<div class="con"><div class="cttl">2. run</div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>run</strong> — refers to the object as <strong>this</strong>. Returns the <strong>lambda result</strong>. Also has a standalone (non-extension) form — runs a block without any receiver and returns its result.</div></div>
+<div class="exp"><div class="lbl">Purpose / When to Use</div>
+<div class="et">• Compute a result using <strong>multiple properties</strong> of an object (access without repeating the object name)<br/>
+• <strong>Group related initialization code</strong> that produces a return value<br/>
+• Replace a block of code that needs to return a computed result</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — run basic example</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// Access multiple properties without repeating object name</span>
+<span class="kw">val</span> isFormValid = user.<span class="fn">run</span> {
+    name.<span class="fn">isNotEmpty</span>() &amp;&amp; email.<span class="fn">contains</span>(<span class="str">"@"</span>) &amp;&amp; age >= <span class="num">18</span>
+    <span class="cm">// this.name, this.email, this.age — this = user</span>
+}
+
+<span class="cm">// Non-extension form — standalone block returning a value</span>
+<span class="kw">val</span> retrofit = <span class="fn">run</span> {
+    <span class="kw">val</span> logging = <span class="cls">HttpLoggingInterceptor</span>()
+    <span class="kw">val</span> okHttp = <span class="cls">OkHttpClient</span>.<span class="cls">Builder</span>().<span class="fn">addInterceptor</span>(logging).<span class="fn">build</span>()
+    <span class="cls">Retrofit</span>.<span class="cls">Builder</span>().<span class="fn">baseUrl</span>(BASE_URL).<span class="fn">client</span>(okHttp).<span class="fn">build</span>()
+}  <span class="cm">// Retrofit returned</span></pre></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — run Android example</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// ViewModel — build a UiState from user object cleanly</span>
+<span class="kw">val</span> state: <span class="cls">UiState</span> = user?.<span class="fn">run</span> {
+    <span class="cls">UiState</span>.<span class="cls">Success</span>(
+        displayName = <span class="str">"$name ($email)"</span>,
+        isVerified = email.<span class="fn">contains</span>(<span class="str">"@gmail"</span>),
+        avatarUrl = profileImageUrl
+    )
+} ?: <span class="cls">UiState</span>.<span class="cls">Error</span>(<span class="str">"No user data"</span>)</pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: Difference between let and run?</div>
+<div class="a">Both return the lambda result. <strong>let</strong> uses it — good for null checks and renaming. <strong>run</strong> uses this — good when accessing multiple properties directly without any prefix. For nullable objects both support ?. but let is preferred for null checks.</div></div>
+<div class="qa"><div class="q">Q: What is the non-extension form of run used for?</div>
+<div class="a">Running a block of code that needs to return a value and uses temporary variables you don't want in the outer scope. It groups related setup code cleanly — like building a Retrofit or OkHttp instance from multiple steps.</div></div></div></div>
+<hr class="div"/>
+
+<!-- WITH -->
+<div class="con"><div class="cttl">3. with</div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>with</strong> — NOT an extension function. The object is passed as a <strong>parameter</strong>. Refers to it as <strong>this</strong>. Returns the <strong>lambda result</strong>. Best for calling multiple methods or setting multiple properties on a guaranteed non-null object.</div></div>
+<div class="exp"><div class="lbl">Purpose / When to Use</div>
+<div class="et">• Call multiple methods on the <strong>same non-null object</strong> without repeating its name<br/>
+• Read multiple values from SharedPreferences<br/>
+• Set multiple properties on ViewBinding — the most common Android use case<br/>
+• NOT suitable for nullable objects — use ?.run {} instead</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — with basic example</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">val</span> person = <span class="cls">Person</span>(<span class="str">"Rahul"</span>, <span class="num">28</span>, <span class="str">"Delhi"</span>)
+
+<span class="cm">// Without with — repeating person.</span>
+<span class="fn">println</span>(person.name); <span class="fn">println</span>(person.age); <span class="fn">println</span>(person.city)
+
+<span class="cm">// With with — clean, this = person</span>
+<span class="fn">with</span>(person) {
+    <span class="fn">println</span>(name)   <span class="cm">// this.name</span>
+    <span class="fn">println</span>(age)
+    <span class="fn">println</span>(city)
+}</pre></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — with Android example</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// ViewBinding — set multiple views without repeating binding.</span>
+<span class="fn">with</span>(binding) {
+    nameTextView.text = user.name
+    emailTextView.text = user.email
+    avatarImageView.<span class="fn">load</span>(user.avatarUrl)
+    progressBar.visibility = <span class="cls">View</span>.GONE
+    submitButton.isEnabled = <span class="kw">true</span>
+    retryButton.visibility = <span class="cls">View</span>.GONE
+}
+
+<span class="cm">// SharedPreferences — multiple reads returning a data object</span>
+<span class="kw">val</span> session = <span class="fn">with</span>(<span class="fn">getSharedPreferences</span>(<span class="str">"prefs"</span>, MODE_PRIVATE)) {
+    <span class="cls">Session</span>(
+        token  = <span class="fn">getString</span>(<span class="str">"token"</span>, <span class="str">""</span>) ?: <span class="str">""</span>,
+        userId = <span class="fn">getString</span>(<span class="str">"userId"</span>, <span class="str">""</span>) ?: <span class="str">""</span>,
+        expiry = <span class="fn">getLong</span>(<span class="str">"expiry"</span>, <span class="num">0</span>)
+    )  <span class="cm">// Session object returned from with</span>
+}</pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: with vs run — difference?</div>
+<div class="a">Both use this and return the lambda result. Difference is <strong>syntax</strong> — run is called ON the object (object.run {}), with takes the object as a parameter (with(object) {}). For nullable objects use object?.run {} — with does not support safe call syntax.</div></div>
+<div class="qa"><div class="q">Q: Can you use with on a nullable object?</div>
+<div class="a">Not safely. with(nullableObject) would throw NPE if null. Use nullableObject?.run {} instead for nullable scenarios.</div></div></div></div>
+<hr class="div"/>
+
+<!-- APPLY -->
+<div class="con"><div class="cttl">4. apply</div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>apply</strong> — refers to the object as <strong>this</strong>. Returns the <strong>object itself</strong> — NOT the last line. Designed for <strong>object configuration</strong> — you set properties and get the configured object back.</div></div>
+<div class="exp"><div class="lbl">Purpose / When to Use</div>
+<div class="et">• <strong>Configure an object right after creating it</strong> — builder pattern style<br/>
+• Set multiple properties on the same object<br/>
+• Intent setup, AlertDialog setup, Retrofit/OkHttp builder config<br/>
+• When you want the <strong>object returned</strong> so you can chain further or assign it</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — apply basic example</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">data class</span> <span class="cls">Address</span>(<span class="kw">var</span> street: <span class="cls">String</span> = <span class="str">""</span>, <span class="kw">var</span> city: <span class="cls">String</span> = <span class="str">""</span>)
+
+<span class="cm">// Without apply</span>
+<span class="kw">val</span> addr1 = <span class="cls">Address</span>()
+addr1.street = <span class="str">"MG Road"</span>
+addr1.city = <span class="str">"Bangalore"</span>
+
+<span class="cm">// With apply — cleaner, returns configured Address object</span>
+<span class="kw">val</span> addr2 = <span class="cls">Address</span>().<span class="fn">apply</span> {
+    street = <span class="str">"MG Road"</span>   <span class="cm">// this.street</span>
+    city = <span class="str">"Bangalore"</span>   <span class="cm">// this.city</span>
+}</pre></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — apply Android example</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// Intent setup</span>
+<span class="kw">val</span> intent = <span class="cls">Intent</span>(<span class="kw">this</span>, <span class="cls">DetailActivity</span>::<span class="kw">class</span>.java).<span class="fn">apply</span> {
+    <span class="fn">putExtra</span>(<span class="str">"userId"</span>, user.id)
+    <span class="fn">putExtra</span>(<span class="str">"userName"</span>, user.name)
+    flags = <span class="cls">Intent</span>.FLAG_ACTIVITY_NEW_TASK
+}
+<span class="fn">startActivity</span>(intent)
+
+<span class="cm">// Retrofit + OkHttp builder</span>
+<span class="kw">val</span> okHttp = <span class="cls">OkHttpClient</span>.<span class="cls">Builder</span>().<span class="fn">apply</span> {
+    <span class="fn">addInterceptor</span>(<span class="cls">HttpLoggingInterceptor</span>().<span class="fn">apply</span> { level = BODY })
+    <span class="fn">connectTimeout</span>(<span class="num">30</span>, <span class="cls">TimeUnit</span>.SECONDS)
+    <span class="fn">readTimeout</span>(<span class="num">30</span>, <span class="cls">TimeUnit</span>.SECONDS)
+}.<span class="fn">build</span>()  <span class="cm">// apply returns Builder, then .build() called</span>
+
+<span class="kw">val</span> retrofit = <span class="cls">Retrofit</span>.<span class="cls">Builder</span>().<span class="fn">apply</span> {
+    <span class="fn">baseUrl</span>(<span class="str">"https://api.example.com/"</span>)
+    <span class="fn">client</span>(okHttp)
+    <span class="fn">addConverterFactory</span>(<span class="cls">GsonConverterFactory</span>.<span class="fn">create</span>())
+}.<span class="fn">build</span>()</pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: What does apply return?</div>
+<div class="a">apply always returns the object it was called on — NOT the last line of the lambda. This is what makes it ideal for configuration — you set up properties and get the configured object back for assignment or chaining.</div></div>
+<div class="qa"><div class="q">Q: apply vs also — both return the object. Difference?</div>
+<div class="a"><strong>apply</strong> uses this — access/set the object's own properties directly. Designed for configuration. <strong>also</strong> uses it — the object is a parameter. Designed for side effects like logging or analytics. Semantically: apply configures the object's state, also observes it without changing it.</div></div></div></div>
+<hr class="div"/>
+
+<!-- ALSO -->
+<div class="con"><div class="cttl">5. also</div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>also</strong> — refers to the object as <strong>it</strong>. Returns the <strong>object itself</strong>. Used for <strong>side effects</strong> — things you do with the object that do not configure or transform it, like logging, analytics tracking, or validation.</div></div>
+<div class="exp"><div class="lbl">Purpose / When to Use</div>
+<div class="et">• <strong>Log</strong> or debug an object mid-chain without breaking the chain<br/>
+• Track <strong>analytics events</strong> when an object is created or fetched<br/>
+• <strong>Validate</strong> an object without modifying it<br/>
+• Any side effect where you want the <strong>original object flowing through unchanged</strong></div></div>
+<div class="exp"><div class="lbl">Think of it as</div>
+<div class="et">"Also do this thing while I have this object — but give me the original object back."</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — also basic example</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// Log intermediate states in a chain — also does not break the chain</span>
+<span class="kw">val</span> result = <span class="fn">listOf</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>)
+    .<span class="fn">also</span> { <span class="fn">println</span>(<span class="str">"Original: $it"</span>) }
+    .<span class="fn">filter</span> { it > <span class="num">2</span> }
+    .<span class="fn">also</span> { <span class="fn">println</span>(<span class="str">"After filter: $it"</span>) }
+    .<span class="fn">map</span> { it * <span class="num">10</span> }
+    .<span class="fn">also</span> { <span class="fn">println</span>(<span class="str">"After map: $it"</span>) }
+<span class="cm">// Output: Original:[1,2,3,4,5] → After filter:[3,4,5] → After map:[30,40,50]</span></pre></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin — also Android example</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// Repository — log, cache, and track BEFORE returning user</span>
+<span class="kw">suspend fun</span> <span class="fn">getUser</span>(id: <span class="cls">String</span>): <span class="cls">User</span> {
+    <span class="kw">return</span> apiService.<span class="fn">getUser</span>(id)
+        .<span class="fn">also</span> { user ->
+            <span class="cm">// Side effects — none of these transform the user object</span>
+            logger.<span class="fn">d</span>(<span class="str">"Fetched user: ${user.name}"</span>)
+            userDao.<span class="fn">insert</span>(user)           <span class="cm">// cache locally</span>
+            analytics.<span class="fn">log</span>(<span class="str">"user_fetched"</span>)  <span class="cm">// track event</span>
+        }  <span class="cm">// user object returned unchanged</span>
+}</pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: When would you prefer also over let?</div>
+<div class="a">When you do not want to transform the object — only observe or log it. <strong>let</strong> returns the lambda result (transformation). <strong>also</strong> returns the object unchanged (pass-through). If the object must continue flowing through a chain unchanged, also is the right choice.</div></div>
+<div class="qa"><div class="q">Q: What does also return?</div>
+<div class="a">always returns the object it was called on, NOT the last line. This makes it perfect for mid-chain operations — the chain continues with the same original object.</div></div></div></div>
+
+<div class="nv">
+<button class="nb np" onclick="go('lat',document.querySelectorAll('.sbi')[4],5)">← lateinit vs lazy</button>
+<button class="nb nn" onclick="go('hof',document.querySelectorAll('.sbi')[6],7)">Higher-Order Functions →</button>
+</div></div>
+
+<div class="sec" id="s-hof">
+<div class="thd"><div class="ttag">Section 07 · Kotlin Core</div><div class="ttl">Higher-Order Functions &amp; Lambdas</div>
+<div class="tdesc">inline, noinline, crossinline, reified — the advanced function concepts IBM tests at senior level.</div></div>
+
+<div class="con"><div class="cttl">Lambda &amp; Higher-Order Function</div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt">A <strong>lambda</strong> is an anonymous function stored in a variable or passed as an argument. A <strong>higher-order function</strong> takes a function as a parameter or returns one. This is the foundation of Kotlin's functional style.</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">val</span> multiply: (<span class="cls">Int</span>, <span class="cls">Int</span>) -> <span class="cls">Int</span> = { x, y -> x * y }
+
+<span class="kw">fun</span> <span class="fn">operate</span>(a: <span class="cls">Int</span>, b: <span class="cls">Int</span>, op: (<span class="cls">Int</span>, <span class="cls">Int</span>) -> <span class="cls">Int</span>): <span class="cls">Int</span> = <span class="fn">op</span>(a, b)
+
+<span class="fn">operate</span>(<span class="num">10</span>, <span class="num">5</span>) { x, y -> x + y }   <span class="cm">// trailing lambda syntax — 15</span>
+<span class="fn">operate</span>(<span class="num">10</span>, <span class="num">5</span>, multiply)            <span class="cm">// passing lambda variable — 50</span>
+<span class="kw">val</span> double: (<span class="cls">Int</span>) -> <span class="cls">Int</span> = { it * <span class="num">2</span> }  <span class="cm">// it = default single param name</span></pre></div>
+</div>
+<hr class="div"/>
+
+<div class="con"><div class="cttl">inline <span class="bdg b1">performance</span></div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>inline</strong> functions copy the lambda bytecode directly into the call site instead of creating an anonymous class object. Eliminates object allocation overhead for lambdas — important in hot paths like loops and collection operations.</div></div>
+<div class="exp"><div class="lbl">Expanding Further</div>
+<div class="et">Without inline, every lambda creates an anonymous object at runtime — GC pressure in hot paths. With inline, the compiler pastes the lambda body at every call site — zero object allocation. Downside: large inline functions increase bytecode size at every usage.</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// inline — lambda bytecode pasted at call site, no object created</span>
+<span class="kw">inline fun</span> <span class="fn">measureTime</span>(block: () -> <span class="cls">Unit</span>) {
+    <span class="kw">val</span> start = <span class="cls">System</span>.<span class="fn">currentTimeMillis</span>()
+    <span class="fn">block</span>()
+    <span class="fn">println</span>(<span class="str">"${System.currentTimeMillis() - start}ms"</span>)
+}
+
+<span class="cm">// noinline — exclude one lambda so it can be stored as an object</span>
+<span class="kw">inline fun</span> <span class="fn">register</span>(
+    onSuccess: () -> <span class="cls">Unit</span>,
+    <span class="kw">noinline</span> onError: () -> <span class="cls">Unit</span>   <span class="cm">// NOT inlined — can be stored/passed</span>
+) {
+    <span class="fn">onSuccess</span>()
+    <span class="fn">saveCallback</span>(onError)           <span class="cm">// storing requires noinline</span>
+}
+
+<span class="cm">// crossinline — allow inlining but prevent non-local returns</span>
+<span class="kw">inline fun</span> <span class="fn">runOnBackground</span>(<span class="kw">crossinline</span> block: () -> <span class="cls">Unit</span>) {
+    <span class="cls">Thread</span> { <span class="fn">block</span>() }.<span class="fn">start</span>()
+    <span class="cm">// crossinline: cannot write "return" inside block here</span>
+}</pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: Difference between noinline and crossinline?</div>
+<div class="a"><strong>noinline</strong> — marks a lambda NOT to be inlined so it can be stored as an object or passed to another function. <strong>crossinline</strong> — allows inlining but disallows non-local returns from the lambda. Use crossinline when the lambda is called inside a different execution context (Thread, callback) where returning from the outer function would be invalid.</div></div>
+<div class="qa"><div class="q">Q: When should you NOT use inline?</div>
+<div class="a">For large functions — inlining a 50-line function at every call site bloats bytecode significantly. Use inline for small higher-order functions called frequently, like collection operators or timing utilities.</div></div></div>
+</div>
+<hr class="div"/>
+
+<div class="con"><div class="cttl">reified <span class="bdg b3">inline only</span></div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>reified</strong> retains the actual type at runtime, bypassing type erasure. Can ONLY be used with <strong>inline</strong> functions — inlining pastes the actual type at each call site so the compiler knows T at runtime.</div></div>
+<div class="exp"><div class="lbl">Expanding Further — Why Type Erasure is a Problem</div>
+<div class="et">Normally generics are erased at runtime — <strong>List&lt;String&gt;</strong> becomes just <strong>List</strong> at bytecode level. You cannot write <strong>T::class.java</strong> in a regular generic function because T is unknown. reified with inline solves this by substituting the real type at every call site during compilation.</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// Without reified — compile error, T is erased</span>
+<span class="kw">fun</span> &lt;T&gt; <span class="fn">fromJson</span>(json: <span class="cls">String</span>): T =
+    gson.<span class="fn">fromJson</span>(json, T::<span class="kw">class</span>.java)  <span class="cm">// ❌ T::class not allowed</span>
+
+<span class="cm">// With reified — T is known at runtime at each call site</span>
+<span class="kw">inline fun</span> &lt;<span class="kw">reified</span> T&gt; <span class="fn">fromJson</span>(json: <span class="cls">String</span>): T =
+    gson.<span class="fn">fromJson</span>(json, T::<span class="kw">class</span>.java)  <span class="cm">// ✅ works</span>
+
+<span class="kw">val</span> user = <span class="fn">fromJson</span>&lt;<span class="cls">User</span>&gt;(jsonString)  <span class="cm">// clean — no Class param needed</span>
+
+<span class="cm">// Android — start Activity without passing .class</span>
+<span class="kw">inline fun</span> &lt;<span class="kw">reified</span> T : <span class="cls">Activity</span>&gt; <span class="cls">Context</span>.<span class="fn">startActivity</span>() {
+    <span class="fn">startActivity</span>(<span class="cls">Intent</span>(<span class="kw">this</span>, T::<span class="kw">class</span>.java))
+}
+<span class="fn">startActivity</span>&lt;<span class="cls">DetailActivity</span>&gt;()  <span class="cm">// no .class parameter needed</span></pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: Why does reified only work with inline?</div>
+<div class="a">Because inline copies the function body at every call site. The compiler knows the actual type T at each call site and substitutes it directly into the pasted code. Without inline, the function is a single bytecode method where T is erased — there is no call site to substitute into.</div></div></div>
+</div>
+<div class="nv">
+<button class="nb np" onclick="go('scp',document.querySelectorAll('.sbi')[5],6)">← Scope Functions</button>
+<button class="nb nn" onclick="go('col',document.querySelectorAll('.sbi')[7],8)">Collections →</button>
+</div></div>
+
+<div class="sec" id="s-col">
+<div class="thd"><div class="ttag">Section 08 · Kotlin Core</div><div class="ttl">Collections &amp; Operators</div>
+<div class="tdesc">map, filter, flatMap, reduce, fold, groupBy, partition — most asked in coding rounds.</div></div>
+
+<div class="con"><div class="cttl">Core Operators</div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt">Kotlin collections have built-in <strong>functional operators</strong> that transform, filter, or reduce data. Each returns a new collection — the original is not modified (immutable operation).</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">data class</span> <span class="cls">User</span>(<span class="kw">val</span> name: <span class="cls">String</span>, <span class="kw">val</span> age: <span class="cls">Int</span>, <span class="kw">val</span> isPremium: <span class="cls">Boolean</span>)
+<span class="kw">val</span> users = <span class="fn">listOf</span>(<span class="cls">User</span>(<span class="str">"Alice"</span>,<span class="num">30</span>,<span class="kw">true</span>), <span class="cls">User</span>(<span class="str">"Bob"</span>,<span class="num">17</span>,<span class="kw">false</span>), <span class="cls">User</span>(<span class="str">"Charlie"</span>,<span class="num">25</span>,<span class="kw">true</span>))
+
+<span class="cm">// MAP — transform each element, returns same-size list</span>
+users.<span class="fn">map</span> { it.name }                  <span class="cm">// [Alice, Bob, Charlie]</span>
+users.<span class="fn">map</span> { it.name.<span class="fn">uppercase</span>() }     <span class="cm">// [ALICE, BOB, CHARLIE]</span>
+
+<span class="cm">// FILTER — keep matching elements</span>
+users.<span class="fn">filter</span> { it.age >= <span class="num">18</span> }         <span class="cm">// [Alice, Charlie]</span>
+users.<span class="fn">filter</span> { it.isPremium }          <span class="cm">// [Alice, Charlie]</span>
+
+<span class="cm">// FLATMAP — map then flatten (list of lists → flat list)</span>
+<span class="fn">listOf</span>(<span class="fn">listOf</span>(<span class="str">"a"</span>,<span class="str">"b"</span>), <span class="fn">listOf</span>(<span class="str">"c"</span>,<span class="str">"d"</span>)).<span class="fn">flatMap</span> { it }  <span class="cm">// [a,b,c,d]</span>
+
+<span class="cm">// REDUCE — combine, no initial value (throws on empty list)</span>
+<span class="fn">listOf</span>(<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>).<span class="fn">reduce</span> { acc, n -> acc + n }  <span class="cm">// 6</span>
+
+<span class="cm">// FOLD — combine WITH initial value (safe on empty list)</span>
+<span class="fn">listOf</span>(<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>).<span class="fn">fold</span>(<span class="num">100</span>) { acc, n -> acc + n }  <span class="cm">// 106</span>
+
+<span class="cm">// GROUPBY — Map&lt;Key, List&lt;T&gt;&gt;</span>
+users.<span class="fn">groupBy</span> { it.isPremium }  <span class="cm">// {true=[Alice,Charlie], false=[Bob]}</span>
+
+<span class="cm">// PARTITION — Pair&lt;List, List&gt;</span>
+<span class="kw">val</span> (adults, minors) = users.<span class="fn">partition</span> { it.age >= <span class="num">18</span> }
+
+<span class="cm">// ANY, ALL, NONE, COUNT</span>
+users.<span class="fn">any</span>  { it.age < <span class="num">18</span> }    <span class="cm">// true</span>
+users.<span class="fn">all</span>  { it.age >= <span class="num">18</span> }   <span class="cm">// false</span>
+users.<span class="fn">none</span> { it.age > <span class="num">60</span> }    <span class="cm">// true</span>
+users.<span class="fn">count</span>{ it.isPremium }    <span class="cm">// 2</span>
+
+<span class="cm">// FIRST vs FIRSTORNULL vs FIND</span>
+users.<span class="fn">first</span>       { it.age > <span class="num">20</span> }  <span class="cm">// throws NoSuchElementException if not found</span>
+users.<span class="fn">firstOrNull</span> { it.age > <span class="num">50</span> }  <span class="cm">// null — safe</span>
+users.<span class="fn">find</span>        { it.name == <span class="str">"Bob"</span> }  <span class="cm">// same as firstOrNull</span></pre></div>
+</div>
+<hr class="div"/>
+
+<div class="con"><div class="cttl">asSequence() — Lazy Evaluation</div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>asSequence()</strong> converts a collection to a lazy sequence. Instead of creating a full intermediate list at each step, it processes one element at a time through the entire pipeline — critical performance optimization for large collections.</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// WITHOUT sequence — 2 full lists created in memory</span>
+(<span class="num">1</span>..<span class="num">1_000_000</span>)
+    .<span class="fn">filter</span> { it % <span class="num">2</span> == <span class="num">0</span> }   <span class="cm">// list of 500k elements</span>
+    .<span class="fn">map</span>    { it * <span class="num">3</span> }            <span class="cm">// another 500k list</span>
+    .<span class="fn">take</span>   (<span class="num">5</span>)                    <span class="cm">// takes 5 from 500k</span>
+
+<span class="cm">// WITH sequence — 1 element at a time, stops after 5 found</span>
+(<span class="num">1</span>..<span class="num">1_000_000</span>).<span class="fn">asSequence</span>()
+    .<span class="fn">filter</span> { it % <span class="num">2</span> == <span class="num">0</span> }   <span class="cm">// lazy — no list</span>
+    .<span class="fn">map</span>    { it * <span class="num">3</span> }            <span class="cm">// lazy — no list</span>
+    .<span class="fn">take</span>   (<span class="num">5</span>)                    <span class="cm">// stops immediately after 5!</span>
+    .<span class="fn">toList</span>()                      <span class="cm">// terminal op — triggers execution</span></pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: Difference between reduce and fold?</div>
+<div class="a"><strong>reduce</strong> has no initial value — uses first element as accumulator. Throws NoSuchElementException on empty list. <strong>fold</strong> requires an initial value — safe on empty collections. Prefer fold for safety unless the list is guaranteed non-empty.</div></div>
+<div class="qa"><div class="q">Q: When should you NOT use asSequence?</div>
+<div class="a">For small collections. Sequences have overhead from lazy wrapper objects and lambda call indirection. The crossover where sequences outperform eager evaluation is roughly 1000+ elements with multiple chained operators. For small lists, regular operators are faster.</div></div></div>
+</div>
+<div class="nv">
+<button class="nb np" onclick="go('hof',document.querySelectorAll('.sbi')[6],7)">← Higher-Order Functions</button>
+<button class="nb nn" onclick="go('del',document.querySelectorAll('.sbi')[8],9)">Delegation →</button>
+</div></div>
+
+<div class="sec" id="s-del">
+<div class="thd"><div class="ttag">Section 09 · Kotlin Core</div><div class="ttl">Delegation</div>
+<div class="tdesc">Delegate property or class behavior to another object using the by keyword.</div></div>
+
+<div class="con"><div class="cttl">Delegates.observable — React to Property Changes</div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>Delegates.observable</strong> calls a callback every time the property value changes, providing the property name, old value, and new value. Useful for reacting to state changes without LiveData or StateFlow.</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">class</span> <span class="cls">UserPreferences</span> {
+    <span class="kw">var</span> theme: <span class="cls">String</span> <span class="kw">by</span> <span class="cls">Delegates</span>.<span class="fn">observable</span>(<span class="str">"light"</span>) { prop, old, new ->
+        <span class="fn">println</span>(<span class="str">"${prop.name} changed: $old -> $new"</span>)
+        <span class="fn">applyTheme</span>(new)
+    }
+}
+<span class="kw">val</span> prefs = <span class="cls">UserPreferences</span>()
+prefs.theme = <span class="str">"dark"</span>    <span class="cm">// theme changed: light -> dark</span>
+prefs.theme = <span class="str">"system"</span>  <span class="cm">// theme changed: dark -> system</span></pre></div>
+</div>
+<hr class="div"/>
+
+<div class="con"><div class="cttl">Class Delegation — by keyword</div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt">Class delegation using <strong>by</strong> forwards all interface method calls to another object automatically. You only override the methods you want to change — everything else is delegated with zero boilerplate. Implements the Decorator pattern cleanly.</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">interface</span> <span class="cls">UserRepository</span> {
+    <span class="kw">suspend fun</span> <span class="fn">getUser</span>(id: <span class="cls">String</span>): <span class="cls">User</span>
+    <span class="kw">suspend fun</span> <span class="fn">saveUser</span>(user: <span class="cls">User</span>)
+    <span class="kw">suspend fun</span> <span class="fn">deleteUser</span>(id: <span class="cls">String</span>)
+}
+
+<span class="cm">// Logging decorator — only override getUser, rest auto-delegated</span>
+<span class="kw">class</span> <span class="cls">LoggingUserRepository</span>(
+    <span class="kw">private val</span> delegate: <span class="cls">UserRepository</span>
+) : <span class="cls">UserRepository</span> <span class="kw">by</span> delegate {    <span class="cm">// ALL methods forwarded to delegate</span>
+
+    <span class="kw">override suspend fun</span> <span class="fn">getUser</span>(id: <span class="cls">String</span>): <span class="cls">User</span> {
+        <span class="fn">println</span>(<span class="str">"Getting user: $id"</span>)       <span class="cm">// add logging</span>
+        <span class="kw">return</span> delegate.<span class="fn">getUser</span>(id)       <span class="cm">// delegate the real call</span>
+    }
+    <span class="cm">// saveUser() and deleteUser() auto-forwarded — no code needed</span>
+}</pre></div>
+</div>
+<hr class="div"/>
+
+<div class="con"><div class="cttl">by viewModels() — Behind the Scenes</div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>by viewModels()</strong> is an Android KTX property delegate that lazily retrieves a ViewModel from ViewModelProvider on first access and caches it — all through Kotlin's delegation mechanism.</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="cm">// What you write</span>
+<span class="kw">val</span> viewModel: <span class="cls">UserViewModel</span> <span class="kw">by</span> <span class="fn">viewModels</span>()
+
+<span class="cm">// What Kotlin generates behind the scenes</span>
+<span class="kw">private val</span> _vm_delegate = <span class="fn">viewModels</span>&lt;<span class="cls">UserViewModel</span>&gt;()
+<span class="kw">val</span> viewModel: <span class="cls">UserViewModel</span>
+    <span class="kw">get</span>() = _vm_delegate.<span class="fn">getValue</span>(<span class="kw">this</span>, ::<span class="fn">viewModel</span>)
+
+<span class="cm">// viewModels() returns Lazy&lt;VM&gt; which internally calls:</span>
+<span class="cm">// ViewModelProvider(this)[UserViewModel::class.java]</span></pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: Difference between by viewModels() and ViewModelProvider(this).get()?</div>
+<div class="a">They return the same ViewModel instance. by viewModels() is lazy — only calls ViewModelProvider on first property access. It is concise and integrates with Kotlin delegation. Internally they perform the same ViewModelStore lookup.</div></div></div>
+</div>
+<div class="nv">
+<button class="nb np" onclick="go('col',document.querySelectorAll('.sbi')[7],8)">← Collections</button>
+<button class="nb nn" onclick="go('gen',document.querySelectorAll('.sbi')[9],10)">Generics →</button>
+</div></div>
+
+<div class="sec" id="s-gen">
+<div class="thd"><div class="ttag">Section 10 · Kotlin Core</div><div class="ttl">Generics</div>
+<div class="tdesc">Covariance (out), Contravariance (in), Star Projection, Type Erasure.</div></div>
+
+<div class="con"><div class="cttl">out T — Covariance (Producer)</div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>out T</strong> — the class can only <strong>produce/return</strong> T. Cannot accept T as a parameter. Allows a subtype to be used where a supertype is expected (covariant).</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">interface</span> <span class="cls">ApiResponse</span>&lt;<span class="kw">out</span> T&gt; {
+    <span class="kw">fun</span> <span class="fn">getData</span>(): T       <span class="cm">// ✅ can produce/return T</span>
+    <span class="cm">// fun set(item: T) {} ❌ cannot consume T as parameter</span>
+}
+
+<span class="kw">val</span> userResponse: <span class="cls">ApiResponse</span>&lt;<span class="cls">User</span>&gt; = <span class="fn">fetchResponse</span>()
+<span class="kw">val</span> anyResponse: <span class="cls">ApiResponse</span>&lt;<span class="cls">Any</span>&gt; = userResponse  <span class="cm">// ✅ covariant — User IS-A Any</span>
+
+<span class="cm">// Kotlin List is covariant — List&lt;String&gt; can be used as List&lt;Any&gt;</span>
+<span class="kw">val</span> strings: <span class="cls">List</span>&lt;<span class="cls">String</span>&gt; = <span class="fn">listOf</span>(<span class="str">"a"</span>, <span class="str">"b"</span>)
+<span class="kw">val</span> anys: <span class="cls">List</span>&lt;<span class="cls">Any</span>&gt; = strings  <span class="cm">// ✅ works because List is declared out T</span></pre></div>
+</div>
+<hr class="div"/>
+
+<div class="con"><div class="cttl">in T — Contravariance (Consumer)</div>
+<div class="def"><div class="lbl">Definition</div>
+<div class="dt"><strong>in T</strong> — the class can only <strong>consume/accept</strong> T. Cannot produce/return T. Allows a supertype to be used where a subtype is expected (contravariant).</div></div>
+<div class="cw"><div class="ch"><span class="cl">kotlin</span><button class="cc" onclick="copyCode(this)">copy</button></div>
+<pre><span class="kw">interface</span> <span class="cls">EventLogger</span>&lt;<span class="kw">in</span> T&gt; {
+    <span class="kw">fun</span> <span class="fn">log</span>(event: T)    <span class="cm">// ✅ can consume T</span>
+    <span class="cm">// fun get(): T {}   ❌ cannot produce T</span>
+}
+
+<span class="kw">val</span> anyLogger: <span class="cls">EventLogger</span>&lt;<span class="cls">Any</span>&gt; = <span class="fn">createLogger</span>()
+<span class="kw">val</span> clickLogger: <span class="cls">EventLogger</span>&lt;<span class="cls">ClickEvent</span>&gt; = anyLogger
+<span class="cm">// ✅ Any logger can handle ClickEvent — contravariance</span></pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: Simple trick to remember in vs out?</div>
+<div class="a">Producer <strong>out</strong> — the class gives you T, you read from it. Consumer <strong>in</strong> — the class takes T from you, you write into it. Kotlin List is out (read-only). MutableList is invariant (no in/out) because it can both read and write.</div></div>
+<div class="qa"><div class="q">Q: What is star projection?</div>
+<div class="a">Box&lt;*&gt; means you don't know or don't care about the type. You can read from it as Any? but cannot write to it. Used when passing a generic object around without needing its specific type parameter.</div></div></div>
+</div>
+<div class="nv">
+<button class="nb np" onclick="go('del',document.querySelectorAll('.sbi')[8],9)">← Delegation</button>
+<button class="nb nn" onclick="go('sol',document.querySelectorAll('.sbi')[10],11)">SOLID Principles →</button>
+</div></div>
+
+<div class="sec" id="s-sol">
+<div class="thd"><div class="ttag">Section 11 · Architecture</div><div class="ttl">SOLID Principles</div>
+<div class="tdesc">All 5 principles with real Kotlin + Android codebase examples. No Shape or Rectangle classes.</div></div>
+
+<!-- S -->
+<div class="solid-card">
+<div class="sh" style="background:rgba(56,189,248,.05);border-bottom:1px solid var(--br)">
+  <div class="sl" style="background:rgba(56,189,248,.12);color:var(--ac)">S</div>
+  <div><div class="sn" style="color:var(--ac)">Single Responsibility Principle</div>
+  <div class="sg">A class should have only ONE reason to change.</div></div>
+</div>
+<div class="sb2">
+<div class="def" style="margin-top:14px"><div class="lbl">Definition</div>
+<div class="dt">Every class, function, or module should do <strong>one thing only</strong>. If a class has multiple responsibilities, changes in one area can break unrelated functionality. Split it into focused, single-purpose classes.</div></div>
+<div class="cw" style="margin-top:12px">
+<span class="clbl bad">❌ BAD — LoginViewModel doing 5 different jobs</span>
+<pre><span class="kw">class</span> <span class="cls">LoginViewModel</span> : <span class="cls">ViewModel</span>() {
+    <span class="kw">fun</span> <span class="fn">login</span>(email: <span class="cls">String</span>, pass: <span class="cls">String</span>) {
+        <span class="cm">// 1. Validating input</span>
+        <span class="kw">if</span> (!email.<span class="fn">contains</span>(<span class="str">"@"</span>)) <span class="kw">return</span>
+        <span class="cm">// 2. Making API call directly</span>
+        <span class="kw">val</span> resp = <span class="cls">Retrofit</span>.<span class="fn">create</span>(<span class="cls">ApiService</span>::<span class="kw">class</span>.java).<span class="fn">login</span>(email, pass)
+        <span class="cm">// 3. Saving token to SharedPreferences</span>
+        prefs.<span class="fn">edit</span>().<span class="fn">putString</span>(<span class="str">"token"</span>, resp.token).<span class="fn">apply</span>()
+        <span class="cm">// 4. Logging to analytics</span>
+        <span class="cls">Firebase</span>.<span class="fn">logEvent</span>(<span class="str">"login_success"</span>)
+        <span class="cm">// 5. Formatting display name</span>
+        _displayName.<span class="fn">value</span> = email.<span class="fn">substringBefore</span>(<span class="str">"@"</span>).<span class="fn">replaceFirstChar</span> { it.<span class="fn">uppercase</span>() }
+    }
+}</pre></div>
+<div class="cw">
+<span class="clbl good">✅ GOOD — Each class has one job, one reason to change</span>
+<pre><span class="cm">// 1. Only validates — changes only if validation rules change</span>
+<span class="kw">class</span> <span class="cls">LoginValidator</span> {
+    <span class="kw">fun</span> <span class="fn">validate</span>(email: <span class="cls">String</span>, pass: <span class="cls">String</span>): <span class="cls">ValidationResult</span> {
+        <span class="kw">val</span> emailOk = email.<span class="fn">contains</span>(<span class="str">"@"</span>) &amp;&amp; email.<span class="fn">contains</span>(<span class="str">"."</span>)
+        <span class="kw">val</span> passOk  = pass.length >= <span class="num">8</span>
+        <span class="kw">return</span> <span class="cls">ValidationResult</span>(emailOk &amp;&amp; passOk)
+    }
+}
+
+<span class="cm">// 2. Only handles auth API — changes only if auth endpoint changes</span>
+<span class="kw">interface</span> <span class="cls">AuthRepository</span> {
+    <span class="kw">suspend fun</span> <span class="fn">login</span>(email: <span class="cls">String</span>, pass: <span class="cls">String</span>): <span class="cls">AuthToken</span>
+}
+
+<span class="cm">// 3. Only stores tokens — changes only if storage mechanism changes</span>
+<span class="kw">class</span> <span class="cls">TokenManager</span> <span class="ann">@Inject</span> <span class="kw">constructor</span>(<span class="kw">private val</span> prefs: <span class="cls">SharedPreferences</span>) {
+    <span class="kw">fun</span> <span class="fn">saveToken</span>(token: <span class="cls">String</span>) = prefs.<span class="fn">edit</span>().<span class="fn">putString</span>(<span class="str">"token"</span>, token).<span class="fn">apply</span>()
+}
+
+<span class="cm">// 4. Only tracks events — changes only if analytics provider changes</span>
+<span class="kw">class</span> <span class="cls">AnalyticsManager</span> <span class="ann">@Inject</span> <span class="kw">constructor</span>() {
+    <span class="kw">fun</span> <span class="fn">logLogin</span>() = <span class="cls">Firebase</span>.<span class="fn">logEvent</span>(<span class="str">"login_success"</span>)
+}
+
+<span class="cm">// 5. ViewModel — ORCHESTRATES only, does NOT do the actual work</span>
+<span class="ann">@HiltViewModel</span>
+<span class="kw">class</span> <span class="cls">LoginViewModel</span> <span class="ann">@Inject</span> <span class="kw">constructor</span>(
+    <span class="kw">private val</span> validator: <span class="cls">LoginValidator</span>,
+    <span class="kw">private val</span> authRepo:  <span class="cls">AuthRepository</span>,
+    <span class="kw">private val</span> tokenMgr:  <span class="cls">TokenManager</span>,
+    <span class="kw">private val</span> analytics: <span class="cls">AnalyticsManager</span>
+) : <span class="cls">ViewModel</span>() {
+    <span class="kw">fun</span> <span class="fn">login</span>(email: <span class="cls">String</span>, pass: <span class="cls">String</span>) {
+        <span class="kw">if</span> (!validator.<span class="fn">validate</span>(email, pass).isValid) <span class="kw">return</span>
+        viewModelScope.<span class="fn">launch</span> {
+            <span class="kw">val</span> token = authRepo.<span class="fn">login</span>(email, pass)
+            tokenMgr.<span class="fn">saveToken</span>(token.value)
+            analytics.<span class="fn">logLogin</span>()
+        }
+    }
+}</pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: How does SRP apply to MVVM?</div>
+<div class="a">Each layer has one responsibility — View shows UI (reason to change: design changes), ViewModel holds UI state (reason to change: business logic changes), Repository fetches data (reason to change: data source changes). If ViewModel is making network calls directly, it is violating SRP.</div></div></div>
+</div></div>
+
+<!-- O -->
+<div class="solid-card">
+<div class="sh" style="background:rgba(52,211,153,.05);border-bottom:1px solid var(--br)">
+  <div class="sl" style="background:rgba(52,211,153,.12);color:var(--ac3)">O</div>
+  <div><div class="sn" style="color:var(--ac3)">Open/Closed Principle</div>
+  <div class="sg">Open for extension, closed for modification.</div></div>
+</div>
+<div class="sb2">
+<div class="def" style="margin-top:14px"><div class="lbl">Definition</div>
+<div class="dt">You should be able to add new behavior <strong>without modifying existing working code</strong>. Extend by adding new classes, not by editing old ones. If adding a new feature requires modifying existing tested code — OCP is being violated.</div></div>
+<div class="cw" style="margin-top:12px">
+<span class="clbl bad">❌ BAD — Adding a new push channel requires modifying existing class</span>
+<pre><span class="kw">class</span> <span class="cls">NotificationManager</span> {
+    <span class="kw">fun</span> <span class="fn">send</span>(type: <span class="cls">String</span>, msg: <span class="cls">String</span>) {
+        <span class="kw">when</span> (type) {
+            <span class="str">"FCM"</span>   -> <span class="fn">sendFcm</span>(msg)
+            <span class="str">"SMS"</span>   -> <span class="fn">sendSms</span>(msg)
+            <span class="cm">// Adding WhatsApp = modifying this class = BAD</span>
+            <span class="str">"WA"</span>    -> <span class="fn">sendWhatsApp</span>(msg)
+        }
+    }
+}</pre></div>
+<div class="cw">
+<span class="clbl good">✅ GOOD — New channel = new class, zero modification to existing code</span>
+<pre><span class="kw">interface</span> <span class="cls">NotificationChannel</span> { <span class="kw">fun</span> <span class="fn">send</span>(msg: <span class="cls">String</span>) }
+
+<span class="kw">class</span> <span class="cls">FcmChannel</span> : <span class="cls">NotificationChannel</span> {
+    <span class="kw">override fun</span> <span class="fn">send</span>(msg: <span class="cls">String</span>) { <span class="cm">/* FCM push logic */</span> }
+}
+<span class="kw">class</span> <span class="cls">SmsChannel</span> : <span class="cls">NotificationChannel</span> {
+    <span class="kw">override fun</span> <span class="fn">send</span>(msg: <span class="cls">String</span>) { <span class="cm">/* SMS logic */</span> }
+}
+<span class="cm">// Adding WhatsApp = just a new class, existing code untouched</span>
+<span class="kw">class</span> <span class="cls">WhatsAppChannel</span> : <span class="cls">NotificationChannel</span> {
+    <span class="kw">override fun</span> <span class="fn">send</span>(msg: <span class="cls">String</span>) { <span class="cm">/* WA logic */</span> }
+}
+
+<span class="cm">// Manager is closed for modification — open for extension via Hilt set binding</span>
+<span class="kw">class</span> <span class="cls">NotificationManager</span> <span class="ann">@Inject</span> <span class="kw">constructor</span>(
+    <span class="kw">private val</span> channels: <span class="cls">Set</span>&lt;<span class="cls">NotificationChannel</span>&gt;
+) {
+    <span class="kw">fun</span> <span class="fn">broadcast</span>(msg: <span class="cls">String</span>) = channels.<span class="fn">forEach</span> { it.<span class="fn">send</span>(msg) }
+}</pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: How do you apply OCP in an Android project practically?</div>
+<div class="a">Use interfaces and dependency injection. When you inject a Set or List of implementations via Hilt, adding a new implementation is purely additive — you add the class and a Hilt binding. The existing manager class, tests, and all other code remain completely unchanged.</div></div></div>
+</div></div>
+
+<!-- L -->
+<div class="solid-card">
+<div class="sh" style="background:rgba(129,140,248,.05);border-bottom:1px solid var(--br)">
+  <div class="sl" style="background:rgba(129,140,248,.12);color:var(--ac2)">L</div>
+  <div><div class="sn" style="color:var(--ac2)">Liskov Substitution Principle</div>
+  <div class="sg">Subclass must be substitutable for parent without breaking behavior.</div></div>
+</div>
+<div class="sb2">
+<div class="def" style="margin-top:14px"><div class="lbl">Definition</div>
+<div class="dt">If your code works with a <strong>parent type</strong>, it must still work correctly when a <strong>subclass</strong> is substituted. Never override a method in a way that violates the parent's behavioral contract — throwing UnsupportedOperationException is the classic violation.</div></div>
+<div class="cw" style="margin-top:12px">
+<span class="clbl bad">❌ BAD — ReadOnlyRepository breaks the Repository contract</span>
+<pre><span class="kw">open class</span> <span class="cls">UserRepository</span> {
+    <span class="kw">open fun</span> <span class="fn">save</span>(user: <span class="cls">User</span>)   { <span class="cm">/* saves to DB */</span> }
+    <span class="kw">open fun</span> <span class="fn">delete</span>(id: <span class="cls">String</span>) { <span class="cm">/* deletes from DB */</span> }
+}
+
+<span class="kw">class</span> <span class="cls">ReadOnlyRepository</span> : <span class="cls">UserRepository</span>() {
+    <span class="kw">override fun</span> <span class="fn">save</span>(user: <span class="cls">User</span>) {
+        <span class="kw">throw</span> <span class="cls">UnsupportedOperationException</span>(<span class="str">"Read-only!"</span>)  <span class="cm">// ❌ breaks contract</span>
+    }
+    <span class="kw">override fun</span> <span class="fn">delete</span>(id: <span class="cls">String</span>) {
+        <span class="kw">throw</span> <span class="cls">UnsupportedOperationException</span>(<span class="str">"Read-only!"</span>)  <span class="cm">// ❌ breaks contract</span>
+    }
+}
+<span class="cm">// Any code using UserRepository will crash if ReadOnlyRepository is substituted</span></pre></div>
+<div class="cw">
+<span class="clbl good">✅ GOOD — Honest contracts through interface segregation</span>
+<pre><span class="kw">interface</span> <span class="cls">ReadableUserRepository</span> {
+    <span class="kw">suspend fun</span> <span class="fn">getUser</span>(id: <span class="cls">String</span>): <span class="cls">User</span>
+}
+<span class="kw">interface</span> <span class="cls">WritableUserRepository</span> : <span class="cls">ReadableUserRepository</span> {
+    <span class="kw">suspend fun</span> <span class="fn">saveUser</span>(user: <span class="cls">User</span>)
+    <span class="kw">suspend fun</span> <span class="fn">deleteUser</span>(id: <span class="cls">String</span>)
+}
+
+<span class="cm">// Cache — only read — honest contract, no throws</span>
+<span class="kw">class</span> <span class="cls">CacheUserRepository</span> : <span class="cls">ReadableUserRepository</span> {
+    <span class="kw">override suspend fun</span> <span class="fn">getUser</span>(id: <span class="cls">String</span>): <span class="cls">User</span> { <span class="cm">/* from cache */</span> }
+}
+
+<span class="cm">// Room DB — full read + write — honest contract</span>
+<span class="kw">class</span> <span class="cls">RoomUserRepository</span> : <span class="cls">WritableUserRepository</span> {
+    <span class="kw">override suspend fun</span> <span class="fn">getUser</span>(id: <span class="cls">String</span>): <span class="cls">User</span>  { <span class="cm">/* from Room */</span> }
+    <span class="kw">override suspend fun</span> <span class="fn">saveUser</span>(user: <span class="cls">User</span>)       { <span class="cm">/* to Room */</span> }
+    <span class="kw">override suspend fun</span> <span class="fn">deleteUser</span>(id: <span class="cls">String</span>)     { <span class="cm">/* from Room */</span> }
+}</pre></div>
+<div class="tip">Android rule: Always call <strong>super.onSaveInstanceState()</strong> when overriding — skipping it breaks the parent Activity's state-saving contract and causes state loss on rotation.</div>
+</div></div>
+
+<!-- I -->
+<div class="solid-card">
+<div class="sh" style="background:rgba(251,191,36,.05);border-bottom:1px solid var(--br)">
+  <div class="sl" style="background:rgba(251,191,36,.12);color:var(--warn)">I</div>
+  <div><div class="sn" style="color:var(--warn)">Interface Segregation Principle</div>
+  <div class="sg">Don't force classes to implement methods they don't use.</div></div>
+</div>
+<div class="sb2">
+<div class="def" style="margin-top:14px"><div class="lbl">Definition</div>
+<div class="dt">Split large fat interfaces into smaller focused ones. Each class should only implement the interface methods it actually needs. Forcing a class to implement methods it doesn't use leads to empty stubs or UnsupportedOperationException.</div></div>
+<div class="cw" style="margin-top:12px">
+<span class="clbl bad">❌ BAD — Fat listener forces Fragment to implement all methods</span>
+<pre><span class="kw">interface</span> <span class="cls">UserListListener</span> {
+    <span class="kw">fun</span> <span class="fn">onUserClick</span>(user: <span class="cls">User</span>)
+    <span class="kw">fun</span> <span class="fn">onUserLongClick</span>(user: <span class="cls">User</span>)
+    <span class="kw">fun</span> <span class="fn">onSwipeDelete</span>(user: <span class="cls">User</span>)
+    <span class="kw">fun</span> <span class="fn">onSwipeArchive</span>(user: <span class="cls">User</span>)
+    <span class="kw">fun</span> <span class="fn">onHeaderClick</span>()
+}
+
+<span class="cm">// SearchFragment only needs click — forced to write 4 empty stubs</span>
+<span class="kw">class</span> <span class="cls">SearchFragment</span> : <span class="cls">Fragment</span>(), <span class="cls">UserListListener</span> {
+    <span class="kw">override fun</span> <span class="fn">onUserClick</span>(user: <span class="cls">User</span>) { <span class="fn">navigateToDetail</span>(user) }
+    <span class="kw">override fun</span> <span class="fn">onUserLongClick</span>(user: <span class="cls">User</span>) {}  <span class="cm">// ❌ empty stub</span>
+    <span class="kw">override fun</span> <span class="fn">onSwipeDelete</span>(user: <span class="cls">User</span>) {}   <span class="cm">// ❌ empty stub</span>
+    <span class="kw">override fun</span> <span class="fn">onSwipeArchive</span>(user: <span class="cls">User</span>) {}  <span class="cm">// ❌ empty stub</span>
+    <span class="kw">override fun</span> <span class="fn">onHeaderClick</span>() {}              <span class="cm">// ❌ empty stub</span>
+}</pre></div>
+<div class="cw">
+<span class="clbl good">✅ GOOD — Focused interfaces, each Fragment implements only what it needs</span>
+<pre><span class="kw">interface</span> <span class="cls">OnUserClickListener</span>     { <span class="kw">fun</span> <span class="fn">onUserClick</span>(user: <span class="cls">User</span>) }
+<span class="kw">interface</span> <span class="cls">OnUserLongClickListener</span> { <span class="kw">fun</span> <span class="fn">onUserLongClick</span>(user: <span class="cls">User</span>) }
+<span class="kw">interface</span> <span class="cls">OnSwipeListener</span> {
+    <span class="kw">fun</span> <span class="fn">onSwipeDelete</span>(user: <span class="cls">User</span>)
+    <span class="kw">fun</span> <span class="fn">onSwipeArchive</span>(user: <span class="cls">User</span>)
+}
+
+<span class="cm">// SearchFragment — only click needed</span>
+<span class="kw">class</span> <span class="cls">SearchFragment</span> : <span class="cls">Fragment</span>(), <span class="cls">OnUserClickListener</span> {
+    <span class="kw">override fun</span> <span class="fn">onUserClick</span>(user: <span class="cls">User</span>) { <span class="fn">navigateToDetail</span>(user) }
+}
+
+<span class="cm">// InboxFragment — needs click + swipe</span>
+<span class="kw">class</span> <span class="cls">InboxFragment</span> : <span class="cls">Fragment</span>(), <span class="cls">OnUserClickListener</span>, <span class="cls">OnSwipeListener</span> {
+    <span class="kw">override fun</span> <span class="fn">onUserClick</span>(user: <span class="cls">User</span>)    { <span class="fn">openChat</span>(user) }
+    <span class="kw">override fun</span> <span class="fn">onSwipeDelete</span>(user: <span class="cls">User</span>)  { viewModel.<span class="fn">delete</span>(user) }
+    <span class="kw">override fun</span> <span class="fn">onSwipeArchive</span>(user: <span class="cls">User</span>) { viewModel.<span class="fn">archive</span>(user) }
+}</pre></div>
+</div></div>
+
+<!-- D -->
+<div class="solid-card">
+<div class="sh" style="background:rgba(248,113,113,.05);border-bottom:1px solid var(--br)">
+  <div class="sl" style="background:rgba(248,113,113,.12);color:var(--red)">D</div>
+  <div><div class="sn" style="color:var(--red)">Dependency Inversion Principle</div>
+  <div class="sg">Depend on abstractions, not concretions.</div></div>
+</div>
+<div class="sb2">
+<div class="def" style="margin-top:14px"><div class="lbl">Definition</div>
+<div class="dt">High-level modules (ViewModel) should NOT depend on low-level modules (Retrofit, Room). Both should depend on <strong>abstractions (interfaces)</strong>. This is what makes Dependency Injection possible and tests free of real network calls.</div></div>
+<div class="cw" style="margin-top:12px">
+<span class="clbl bad">❌ BAD — ViewModel directly coupled to Retrofit</span>
+<pre><span class="kw">class</span> <span class="cls">UserViewModel</span> : <span class="cls">ViewModel</span>() {
+    <span class="cm">// Directly creating concrete dependency — cannot mock in tests</span>
+    <span class="kw">private val</span> api = <span class="cls">Retrofit</span>.<span class="cls">Builder</span>()
+        .<span class="fn">baseUrl</span>(<span class="str">"https://api.example.com/"</span>)
+        .<span class="fn">build</span>()
+        .<span class="fn">create</span>(<span class="cls">ApiService</span>::<span class="kw">class</span>.java)
+
+    <span class="kw">fun</span> <span class="fn">getUser</span>(id: <span class="cls">String</span>) = viewModelScope.<span class="fn">launch</span> {
+        <span class="kw">val</span> user = api.<span class="fn">getUser</span>(id)  <span class="cm">// real network call in every test!</span>
+    }
+}</pre></div>
+<div class="cw">
+<span class="clbl good">✅ GOOD — ViewModel depends on interface, not Retrofit</span>
+<pre><span class="cm">// Abstraction — ViewModel knows only this contract</span>
+<span class="kw">interface</span> <span class="cls">UserRepository</span> {
+    <span class="kw">suspend fun</span> <span class="fn">getUser</span>(id: <span class="cls">String</span>): <span class="cls">Result</span>&lt;<span class="cls">User</span>&gt;
+}
+
+<span class="cm">// Low-level: Retrofit implementation — detail hidden from ViewModel</span>
+<span class="kw">class</span> <span class="cls">UserRepositoryImpl</span> <span class="ann">@Inject</span> <span class="kw">constructor</span>(
+    <span class="kw">private val</span> api: <span class="cls">ApiService</span>
+) : <span class="cls">UserRepository</span> {
+    <span class="kw">override suspend fun</span> <span class="fn">getUser</span>(id: <span class="cls">String</span>) = <span class="fn">runCatching</span> { api.<span class="fn">getUser</span>(id) }
+}
+
+<span class="cm">// High-level: ViewModel depends on abstraction only</span>
+<span class="ann">@HiltViewModel</span>
+<span class="kw">class</span> <span class="cls">UserViewModel</span> <span class="ann">@Inject</span> <span class="kw">constructor</span>(
+    <span class="kw">private val</span> repo: <span class="cls">UserRepository</span>  <span class="cm">// interface — not Retrofit</span>
+) : <span class="cls">ViewModel</span>() {
+    <span class="kw">fun</span> <span class="fn">getUser</span>(id: <span class="cls">String</span>) = viewModelScope.<span class="fn">launch</span> {
+        repo.<span class="fn">getUser</span>(id)  <span class="cm">// no idea if it's Retrofit, Room, or a Fake</span>
+    }
+}
+
+<span class="cm">// Test — swap real impl with fake, zero network calls</span>
+<span class="kw">class</span> <span class="cls">FakeUserRepository</span> : <span class="cls">UserRepository</span> {
+    <span class="kw">override suspend fun</span> <span class="fn">getUser</span>(id: <span class="cls">String</span>) =
+        <span class="cls">Result</span>.<span class="fn">success</span>(<span class="cls">User</span>(<span class="str">"1"</span>, <span class="str">"Test User"</span>, <span class="str">"test@test.com"</span>))
+}</pre></div>
+<div class="ib"><div class="lbl">⚡ IBM Q&amp;A</div>
+<div class="qa"><div class="q">Q: How does Hilt implement DIP?</div>
+<div class="a">Hilt's @Binds or @Provides in a Module maps the interface (UserRepository) to the concrete implementation (UserRepositoryImpl). ViewModel only declares @Inject with the interface type — Hilt injects the right implementation at runtime. Switching from Retrofit to GraphQL means only changing the Module — ViewModel and all tests are completely untouched.</div></div>
+<div class="qa"><div class="q">Q: Is Dependency Injection the same as Dependency Inversion Principle?</div>
+<div class="a">No — they are related but different. <strong>DIP</strong> is the principle: depend on abstractions. <strong>DI</strong> is the technique used to achieve it — passing dependencies from outside instead of creating them internally. You can have DI without DIP (injecting a concrete class) but DIP encourages DI through interfaces.</div></div></div>
+</div></div>
+
+<div class="nv">
+<button class="nb np" onclick="go('gen',document.querySelectorAll('.sbi')[9],10)">← Generics</button>
+<button class="nb nn" onclick="go('vis',document.querySelectorAll('.sbi')[0],1)">↩ Back to Start</button>
+</div></div>
+
+</div></div>
+<script>
+const TOTAL = 11;
+function go(id, el, num) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sbi').forEach(s => s.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('pf').style.width = Math.round((num / TOTAL) * 100) + '%';
+  document.getElementById('pc').textContent = num + ' of ' + TOTAL + ' sections';
+  document.getElementById('main').scrollTo({ top: 0, behavior: 'smooth' });
+}
+function copyCode(btn) {
+  const pre = btn.closest('.cw').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText || pre.textContent).then(() => {
+    btn.textContent = '✓ copied';
+    setTimeout(() => btn.textContent = 'copy', 1500);
+  });
+}
+</script>
+</body>
+</html>
